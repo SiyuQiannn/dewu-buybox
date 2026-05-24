@@ -1,0 +1,14 @@
+# Local and generated files
+_extracted_media/
+*.docx
+
+# Dependencies and environment
+node_modules/
+.env
+.env.*
+!.env.example
+
+# OS metadata
+.DS_Store
+Thumbs.db
+

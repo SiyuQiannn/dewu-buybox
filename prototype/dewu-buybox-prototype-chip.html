@@ -1,0 +1,943 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>得物 Buybox 购买选项说明原型 - Chip 交互版</title>
+  <style>
+    :root {
+      --teal: #08c4c4;
+      --teal-dark: #009c9f;
+      --ink: #151821;
+      --muted: #8b8f9c;
+      --soft: #f6f6f9;
+      --line: #e8e9ef;
+      --dark: #25242f;
+      --gray: #474b5c;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #edf0f3;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      letter-spacing: 0;
+    }
+
+    .board {
+      width: 1840px;
+      min-height: 1120px;
+      margin: 0 auto;
+      padding: 34px 36px 42px;
+    }
+
+    .board-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.25;
+    }
+
+    .board-title p {
+      margin: 4px 0 0;
+      color: #6e7280;
+      font-size: 14px;
+    }
+
+    .frames {
+      display: grid;
+      grid-template-columns: repeat(4, 390px);
+      gap: 36px;
+    }
+
+    .phone-wrap {
+      display: grid;
+      gap: 14px;
+    }
+
+    .caption {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .caption span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .phone {
+      position: relative;
+      width: 390px;
+      height: 844px;
+      overflow: hidden;
+      background: #fff;
+      border-radius: 32px;
+      box-shadow: 0 20px 60px rgba(28, 32, 45, 0.18);
+    }
+
+    .status {
+      height: 26px;
+      padding: 8px 22px 0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .topbar {
+      height: 48px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .nav-title {
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .hero {
+      position: relative;
+      height: 214px;
+      background: #d8d8d8;
+      overflow: hidden;
+    }
+
+    .hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.68);
+    }
+
+    .hero-actions {
+      position: absolute;
+      top: 14px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 22px;
+      color: #111;
+    }
+
+    .guarantee-ribbon {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 46px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      background: rgba(51, 55, 59, 0.68);
+      color: #fff;
+      font-size: 15px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .sheet {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 660px;
+      overflow: hidden;
+      background: var(--soft);
+      border-radius: 24px 24px 0 0;
+    }
+
+    .summary {
+      height: 138px;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 78px 1fr 72px;
+      gap: 14px;
+      background: #fff;
+    }
+
+    .thumb {
+      width: 78px;
+      height: 78px;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+    }
+
+    .price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+
+    .dewu-badge {
+      display: inline-grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      background: #000;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .price {
+      font-size: 34px;
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    .summary-sub {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .qty {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 14px;
+      padding-top: 44px;
+      font-size: 18px;
+    }
+
+    .qty-btn {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 4px;
+      background: #f4f4f8;
+      color: #8f92a0;
+    }
+
+    .section {
+      padding: 15px 16px 0;
+    }
+
+    .section-title {
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      color: #7e8290;
+      font-size: 16px;
+    }
+
+    .help-link {
+      color: var(--teal-dark);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .box-chip {
+      min-width: 86px;
+      height: 58px;
+      padding: 0 16px;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      font-size: 17px;
+      font-weight: 800;
+      border: 1px solid transparent;
+    }
+
+    .box-chip.active {
+      border: 3px solid #111;
+    }
+
+    .trust-strip {
+      margin: 12px 16px 8px;
+      padding: 9px 11px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid #d4f1f0;
+      border-radius: 8px;
+      background: #f5fbfb;
+      color: #4a5964;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .trust-strip strong {
+      color: var(--teal-dark);
+      white-space: nowrap;
+    }
+
+    .option-bar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 102px;
+      padding: 12px 12px 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      background: #fff;
+    }
+
+    .buy-option {
+      position: relative;
+      min-width: 0;
+      padding: 13px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-radius: 4px;
+      color: #fff;
+    }
+
+    .buy-option.teal { background: var(--teal); }
+    .buy-option.dark { background: var(--dark); }
+    .buy-option.gray { background: var(--gray); }
+
+    .tag {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 3px 7px;
+      border-radius: 0 4px 0 6px;
+      background: rgba(0, 0, 0, 0.18);
+      font-size: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .tag.ninety {
+      display: inline-flex;
+      gap: 4px;
+      background: #323645;
+      max-width: 90px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 9px;
+    }
+
+    .logo95 {
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .buy-price {
+      font-size: 24px;
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    .buy-option.gray .buy-price {
+      margin-top: 8px;
+    }
+
+    .eta {
+      margin-top: 7px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .page {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: var(--soft);
+    }
+
+    .scroll {
+      overflow: hidden;
+      padding: 12px 14px 86px;
+    }
+
+    .notice {
+      padding: 13px;
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 9px;
+      border: 1px solid #ccf1f0;
+      border-radius: 8px;
+      background: #eefbfb;
+      color: #3d4d56;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .notice b {
+      color: var(--ink);
+    }
+
+    .module {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .crop-compare {
+      position: relative;
+      max-height: 328px;
+      overflow: hidden;
+    }
+
+    .crop-compare::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 30px;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff);
+      pointer-events: none;
+    }
+
+    .module-title {
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .module-title span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .compare-card {
+      margin-top: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .compare-card.selected {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 1px rgba(8, 196, 196, 0.18);
+    }
+
+    .compare-card.mini {
+      padding: 10px 12px;
+    }
+
+    .compare-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .compare-name {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .compare-meta {
+      margin-top: 4px;
+      color: #6f7380;
+      font-size: 12px;
+    }
+
+    .compare-price {
+      font-size: 19px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .pill-row {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .pill {
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 8px;
+      border-radius: 12px;
+      background: #f0f1f5;
+      color: #4e5260;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .pill.teal,
+    .pill.active {
+      background: #e7fbfb;
+      color: #008e91;
+      font-weight: 800;
+    }
+
+    .pill.active {
+      box-shadow: inset 0 0 0 1px #8fe7e6;
+    }
+
+    .inline-explain {
+      margin-top: 9px;
+      padding: 9px 10px;
+      border-radius: 6px;
+      background: #f8fbfb;
+      color: #4e5360;
+      font-size: 12px;
+      line-height: 1.42;
+    }
+
+    .fit {
+      margin-top: 9px;
+      color: #5e626f;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .all-link {
+      height: 38px;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--line);
+      color: var(--teal-dark);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .ai-choices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .choice {
+      padding: 8px 10px;
+      border-radius: 16px;
+      background: #f2f3f7;
+      color: #555a66;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .choice.active {
+      background: var(--teal);
+      color: #fff;
+    }
+
+    .ai-result {
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px solid #d9eeee;
+      border-radius: 8px;
+      background: #f8fbfb;
+    }
+
+    .ai-result h3 {
+      margin: 0 0 7px;
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    .ai-result p {
+      margin: 6px 0 0;
+      color: #5b606d;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .bottom-action {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 72px;
+      padding: 12px 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      background: #fff;
+      border-top: 1px solid var(--line);
+    }
+
+    .action-btn {
+      display: grid;
+      place-items: center;
+      border: 1px solid #d8d9df;
+      border-radius: 4px;
+      background: #fff;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .action-btn.primary {
+      border-color: var(--teal);
+      background: var(--teal);
+      color: #fff;
+    }
+
+    .tabs {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      margin: -12px -14px 12px;
+      padding: 12px 14px 8px;
+      display: flex;
+      gap: 8px;
+      background: var(--soft);
+    }
+
+    .tab {
+      padding: 8px 12px;
+      border-radius: 17px;
+      background: #fff;
+      color: #595d69;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .tab.active {
+      background: var(--teal);
+      color: #fff;
+    }
+
+    .term-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .term {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .term h3 {
+      margin: 0 0 6px;
+      font-size: 14px;
+    }
+
+    .term p {
+      margin: 0;
+      color: #626774;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .category-title {
+      margin: 16px 0 8px;
+      color: #747887;
+      font-size: 13px;
+      font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+  <main class="board">
+    <div class="board-title">
+      <div>
+        <h1>得物 Buybox 购买选项决策体验优化</h1>
+        <p>新版结构：对比页轻量化，说明能力内嵌到可点击 chip</p>
+      </div>
+      <p>v2 / Chip 解释态、全量说明页</p>
+    </div>
+
+    <section class="frames">
+      <div class="phone-wrap">
+        <div class="caption">01 购买选项页入口态 <span>真实 tag + 轻量入口</span></div>
+        <div class="phone">
+          <div class="hero">
+            <img src="assets/bracelet.jpg" alt="商品图" />
+            <div class="hero-actions"><span>‹</span><span>···</span></div>
+            <div class="guarantee-ribbon">盾 3项工序逐件查验 · 正品险 · 7天无理由 · 退货包运费</div>
+          </div>
+          <div class="sheet">
+            <div class="summary">
+              <img class="thumb" src="assets/bracelet.jpg" alt="手镯缩略图" />
+              <div>
+                <div class="price-row"><span class="dewu-badge">得</span><span>¥</span><span class="price">471</span></div>
+                <div class="summary-sub">已选 金色 F 默认包装 ♡</div>
+              </div>
+              <div class="qty"><span class="qty-btn">−</span><span>1</span><span class="qty-btn">＋</span></div>
+            </div>
+            <div class="section">
+              <div class="section-title">款式</div>
+              <div class="chips">
+                <div class="box-chip active">金色</div>
+                <div class="box-chip">玫瑰金色</div>
+              </div>
+            </div>
+            <div class="section">
+              <div class="section-title">尺码</div>
+              <div class="chips"><div class="box-chip active">F</div></div>
+            </div>
+            <div class="section">
+              <div class="section-title">
+                购买选项
+                <span class="help-link">选项怎么选 ›</span>
+              </div>
+            </div>
+            <div class="trust-strip">
+              <span>当前可选方案均经得物查验，具体差异可在「选项怎么选」中查看</span>
+            </div>
+            <div class="option-bar">
+              <div class="buy-option teal">
+                <span class="tag">品牌官方</span>
+                <div class="buy-price">¥476</div>
+                <div class="eta">约2天到</div>
+              </div>
+              <div class="buy-option dark">
+                <span class="tag">品牌专供</span>
+                <div class="buy-price">¥471</div>
+                <div class="eta">约5-6天到</div>
+              </div>
+              <div class="buy-option gray">
+                <span class="tag ninety"><span class="logo95">95</span> 仅鞋盒瑕疵</span>
+                <div class="buy-price">¥395</div>
+                <div class="eta">约1-3天到</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone-wrap">
+        <div class="caption">02 选项怎么选页 <span>点 chip 就地解释</span></div>
+        <div class="phone">
+          <div class="page">
+            <div class="status"><span>9:41</span><span>5G 电量</span></div>
+            <div class="topbar"><span>‹</span><span class="nav-title">选项怎么选</span><span>×</span></div>
+            <div class="scroll">
+              <div class="notice">
+                <span>盾</span>
+                <div><b>当前可选方案均经得物查验或平台品质保障。</b><br />差异主要在价格、渠道、成色、预计到货和售后规则。</div>
+              </div>
+
+              <div class="module">
+                <div class="module-title">当前选项对比 <span>金色 / F / 默认包装</span></div>
+                <div class="compare-card selected">
+                  <div class="compare-head">
+                    <div>
+                      <div class="compare-name">品牌官方</div>
+                      <div class="compare-meta">约2天到 · 官方渠道</div>
+                    </div>
+                    <div class="compare-price">¥476</div>
+                  </div>
+                  <div class="pill-row">
+                    <span class="pill">品牌官方</span>
+                    <span class="pill active">得物查验</span>
+                    <span class="pill">退货包运费</span>
+                    <span class="pill">极速退款</span>
+                  </div>
+                  <div class="inline-explain"><b>得物查验：</b>该商品已提前入仓或进入得物查验仓配节点，完成查验后可更快发出。</div>
+                  <div class="fit">适合希望更快收到，且偏好品牌渠道的用户。</div>
+                </div>
+
+                <div class="compare-card mini">
+                  <div class="compare-head">
+                    <div>
+                      <div class="compare-name">品牌专供</div>
+                      <div class="compare-meta">约5-6天到 · 价格更低</div>
+                    </div>
+                    <div class="compare-price">¥471</div>
+                  </div>
+                  <div class="pill-row">
+                    <span class="pill">品牌专供</span>
+                    <span class="pill teal">得物查验</span>
+                    <span class="pill">正品险</span>
+                    <span class="pill">退货包运费</span>
+                  </div>
+                </div>
+
+                <div class="compare-card mini">
+                  <div class="compare-head">
+                    <div>
+                      <div class="compare-name"><span class="logo95" style="color:#19b9b7">95</span> 仅鞋盒瑕疵</div>
+                      <div class="compare-meta">约1-3天到 · 成色性价比</div>
+                    </div>
+                    <div class="compare-price">¥395</div>
+                  </div>
+                  <div class="pill-row">
+                    <span class="pill"><span class="logo95" style="color:#19b9b7">95</span> 仅鞋盒瑕疵</span>
+                    <span class="pill teal">95分查验</span>
+                    <span class="pill">二手商品售后规则</span>
+                  </div>
+                </div>
+                <div class="all-link"><span>查看全部购买选项说明</span><span>渠道 / 成色 / 查验时效 / 售后 ›</span></div>
+              </div>
+
+              <div class="module">
+                <div class="module-title">AI 帮我选 <span>单选主偏好</span></div>
+                <div class="ai-choices">
+                  <span class="choice">最快收到</span>
+                  <span class="choice">价格更低</span>
+                  <span class="choice">售后更灵活</span>
+                  <span class="choice">品牌渠道优先</span>
+                  <span class="choice">成色性价比</span>
+                </div>
+              </div>
+            </div>
+            <div class="bottom-action">
+              <div class="action-btn">返回选择</div>
+              <div class="action-btn primary">选择 ¥476</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone-wrap">
+        <div class="caption">03 AI 推荐结果态 <span>推荐取舍，不做硬筛选</span></div>
+        <div class="phone">
+          <div class="page">
+            <div class="status"><span>9:41</span><span>5G 电量</span></div>
+            <div class="topbar"><span>‹</span><span class="nav-title">选项怎么选</span><span>×</span></div>
+            <div class="scroll">
+              <div class="notice">
+                <span>盾</span>
+                <div><b>当前可选方案均经得物查验或平台品质保障。</b><br />差异主要在价格、渠道、成色、预计到货和售后规则。</div>
+              </div>
+
+              <div class="module crop-compare">
+                <div class="module-title">当前选项对比 <span>金色 / F / 默认包装</span></div>
+                <div class="compare-card selected">
+                  <div class="compare-head">
+                    <div>
+                      <div class="compare-name">品牌官方</div>
+                      <div class="compare-meta">约2天到 · 官方渠道</div>
+                    </div>
+                    <div class="compare-price">¥476</div>
+                  </div>
+                  <div class="pill-row">
+                    <span class="pill">品牌官方</span>
+                    <span class="pill teal">得物查验</span>
+                    <span class="pill">退货包运费</span>
+                    <span class="pill">极速退款</span>
+                  </div>
+                  <div class="inline-explain"><b>得物查验：</b>该商品已提前入仓或进入得物查验仓配节点，完成查验后可更快发出。</div>
+                  <div class="fit">适合希望更快收到，且偏好品牌渠道的用户。</div>
+                </div>
+                <div class="compare-card mini">
+                  <div class="compare-head">
+                    <div>
+                      <div class="compare-name">品牌专供</div>
+                      <div class="compare-meta">约5-6天到 · 价格更低</div>
+                    </div>
+                    <div class="compare-price">¥471</div>
+                  </div>
+                  <div class="pill-row">
+                    <span class="pill">品牌专供</span>
+                    <span class="pill teal">得物查验</span>
+                    <span class="pill">正品险</span>
+                    <span class="pill">退货包运费</span>
+                  </div>
+                  <div class="fit">适合更在意价格，同时可以接受稍长等待的用户。</div>
+                </div>
+              </div>
+
+              <div class="module">
+                <div class="module-title">AI 帮我选 <span>当前尺码 3 个可选方案</span></div>
+                <div class="ai-choices">
+                  <span class="choice">最快收到</span>
+                  <span class="choice">价格更低</span>
+                  <span class="choice active">售后更灵活</span>
+                  <span class="choice">品牌渠道优先</span>
+                  <span class="choice">成色性价比</span>
+                </div>
+                <div class="ai-result">
+                  <h3>推荐选择 ¥471 / 约5-6天到的品牌专供选项</h3>
+                  <p>该方案售后权益更完整，适合更在意售后灵活性的需求。</p>
+                  <p><b>取舍：</b>不是当前最快到货；想更快收到可考虑 ¥476 / 约2天到的选项。</p>
+                </div>
+              </div>
+            </div>
+            <div class="bottom-action">
+              <div class="action-btn">返回对比</div>
+              <div class="action-btn primary">选择 ¥471</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone-wrap">
+        <div class="caption">04 购买选项说明页 <span>分类查看全部说明</span></div>
+        <div class="phone">
+          <div class="page">
+            <div class="status"><span>9:41</span><span>5G 电量</span></div>
+            <div class="topbar"><span>‹</span><span class="nav-title">购买选项说明</span><span>×</span></div>
+            <div class="scroll">
+              <div class="tabs">
+                <span class="tab active">渠道</span>
+                <span class="tab">成色</span>
+                <span class="tab">查验时效</span>
+                <span class="tab">售后权益</span>
+              </div>
+
+              <div class="notice">
+                <span>盾</span>
+                <div><b>不同标签说明的是渠道、成色、履约或售后差异。</b><br />这些差异不代表正品保障差异。</div>
+              </div>
+
+              <div class="category-title">渠道说明</div>
+              <div class="term-list">
+                <div class="term">
+                  <h3>品牌官方</h3>
+                  <p>品牌方或授权相关渠道供货，商品仍经过得物查验或平台品质保障。适合偏好品牌渠道的用户。</p>
+                </div>
+                <div class="term">
+                  <h3>品牌专供</h3>
+                  <p>品牌相关渠道供货，可能包含得物专属款、限定款或专供款。不同款式以页面展示为准。</p>
+                </div>
+                <div class="term">
+                  <h3>全球购</h3>
+                  <p>来自境外相关渠道，通常到货时间更长，按平台跨境链路完成查验或品质保障。</p>
+                </div>
+                <div class="term">
+                  <h3>保税直发</h3>
+                  <p>商品位于海关监管保税仓，下单后从保税仓发出，通常比境外直邮更快。</p>
+                </div>
+              </div>
+
+              <div class="category-title">其他分类预览</div>
+              <div class="term">
+                <h3>成色 / 查验时效 / 售后权益</h3>
+                <p>可切换顶部分类查看 95 分、仅鞋盒瑕疵、得物查验、提前入仓、正品险、七天无理由、退货包运费等说明。</p>
+              </div>
+            </div>
+            <div class="bottom-action">
+              <div class="action-btn">返回对比</div>
+              <div class="action-btn primary">我知道了</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
