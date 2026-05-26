@@ -7,7 +7,7 @@
   <meta name="description" content="围绕得物多购买选项场景的电商产品项目，通过选项对比、标签解释、AI 帮我选与确认订单链路，降低用户决策成本。" />
   <style>
     :root {
-      --bg: #eef2f5;
+      --bg: #eef4f5;
       --panel: #ffffff;
       --ink: #10131c;
       --muted: #6c7280;
@@ -18,7 +18,12 @@
       --blue: #12c7c7;
       --dark: #24242f;
       --gray: #474c5f;
-      --shadow: 0 24px 70px rgba(21, 29, 48, 0.14);
+      --dewu-ink: #090c12;
+      --dewu-cyan-soft: #e7fbfb;
+      --track: rgba(18, 199, 199, 0.16);
+      --shadow: 0 18px 42px rgba(21, 29, 48, 0.12);
+      --stage-shadow: 0 26px 80px rgba(3, 12, 20, 0.28);
+      --motion: cubic-bezier(0.2, 0.75, 0.2, 1);
     }
 
     * {
@@ -27,14 +32,38 @@
 
     html {
       scroll-behavior: smooth;
+      scroll-padding-top: 84px;
     }
 
     body {
       margin: 0;
-      background: var(--bg);
+      background:
+        linear-gradient(180deg, rgba(232, 244, 246, 0.9), rgba(246, 249, 249, 1) 28%, rgba(237, 244, 246, 1) 100%);
       color: var(--ink);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      font-family: "MiSans", "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       letter-spacing: 0;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      background:
+        linear-gradient(118deg, transparent 0 28%, rgba(18, 199, 199, 0.11) 28% 29%, transparent 29% 61%, rgba(9, 12, 18, 0.05) 61% 61.6%, transparent 61.6%),
+        repeating-linear-gradient(90deg, rgba(10, 18, 24, 0.028) 0 1px, transparent 1px 72px);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background: repeating-linear-gradient(135deg, rgba(18, 199, 199, 0.035) 0 1px, transparent 1px 12px);
+      opacity: 0.65;
     }
 
     a {
@@ -55,9 +84,9 @@
       align-items: center;
       justify-content: space-between;
       padding: 0 5vw;
-      background: rgba(238, 242, 245, 0.9);
-      border-bottom: 1px solid rgba(207, 214, 224, 0.8);
-      backdrop-filter: blur(18px);
+      background: rgba(242, 248, 249, 0.82);
+      border-bottom: 1px solid rgba(178, 204, 211, 0.5);
+      backdrop-filter: blur(22px);
     }
 
     .brand {
@@ -73,35 +102,60 @@
       height: 32px;
       display: grid;
       place-items: center;
-      border-radius: 8px;
-      background: #0f121a;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--dewu-ink), #1f2630);
       color: #fff;
       font-size: 13px;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 0 3px rgba(18, 199, 199, 0.11);
     }
 
     .nav {
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 6px;
       color: #4e5563;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
     }
 
+    .nav a {
+      padding: 8px 10px;
+      border-radius: 999px;
+      transition: background 180ms var(--motion), color 180ms var(--motion), transform 180ms var(--motion);
+      white-space: nowrap;
+    }
+
     .nav a:hover {
+      background: rgba(18, 199, 199, 0.1);
       color: var(--teal-dark);
+      transform: translateY(-1px);
     }
 
     main {
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     .hero {
-      padding: 72px 5vw 44px;
+      order: 1;
+      min-height: clamp(560px, 66vh, 680px);
+      padding: 52px 5vw 42px;
       display: grid;
-      grid-template-columns: minmax(360px, 0.96fr) minmax(420px, 1.04fr);
-      gap: 44px;
+      grid-template-columns: minmax(360px, 0.92fr) minmax(420px, 1.08fr);
+      gap: 38px;
       align-items: center;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 5vw;
+      right: 5vw;
+      bottom: 14px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(18, 199, 199, 0.7), rgba(9, 12, 18, 0.16), transparent);
     }
 
     .eyebrow {
@@ -111,10 +165,11 @@
       padding: 0 12px;
       border: 1px solid #c5eff0;
       border-radius: 999px;
-      background: #ebfbfb;
+      background: rgba(231, 251, 251, 0.82);
       color: #087f82;
       font-size: 13px;
       font-weight: 800;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8);
     }
 
     h1 {
@@ -123,6 +178,11 @@
       font-size: clamp(38px, 4.7vw, 64px);
       line-height: 1.08;
       letter-spacing: 0;
+      text-wrap: balance;
+      background: linear-gradient(110deg, #090c12 0%, #090c12 54%, #078f92 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
 
     .lead {
@@ -147,23 +207,26 @@
       align-items: center;
       justify-content: center;
       border: 1px solid #cfd6df;
-      border-radius: 8px;
-      background: #fff;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.78);
       color: var(--ink);
       font-weight: 850;
       cursor: pointer;
-      transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      transition: transform 180ms var(--motion), border-color 180ms var(--motion), background 180ms var(--motion), box-shadow 180ms var(--motion);
     }
 
     .btn:hover {
-      transform: translateY(-1px);
+      transform: translateY(-2px);
       border-color: #aeb8c7;
+      box-shadow: 0 10px 28px rgba(12, 24, 32, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
     }
 
     .btn.primary {
       border-color: var(--teal);
       background: var(--teal);
       color: #fff;
+      box-shadow: 0 0 0 4px rgba(18, 199, 199, 0.12), 0 14px 30px rgba(18, 199, 199, 0.22);
     }
 
     .btn.compact {
@@ -174,10 +237,22 @@
 
     .hero-card {
       padding: 22px;
-      border: 1px solid rgba(210, 218, 228, 0.85);
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.78);
-      box-shadow: var(--shadow);
+      border: 1px solid rgba(196, 226, 230, 0.9);
+      border-radius: 20px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.93), rgba(247, 252, 252, 0.88)),
+        repeating-linear-gradient(135deg, rgba(18, 199, 199, 0.04) 0 1px, transparent 1px 12px);
+      box-shadow: 0 26px 68px rgba(7, 20, 30, 0.12);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 5px;
+      background: linear-gradient(90deg, var(--teal), rgba(18, 199, 199, 0.1), var(--dewu-ink));
     }
 
     .hero-card h2 {
@@ -194,7 +269,13 @@
       padding: 14px;
       border: 1px solid var(--line);
       border-radius: 12px;
-      background: #fff;
+      background: rgba(255, 255, 255, 0.86);
+      transition: transform 180ms var(--motion), border-color 180ms var(--motion);
+    }
+
+    .logic-item:hover {
+      transform: translateX(4px);
+      border-color: rgba(18, 199, 199, 0.42);
     }
 
     .logic-item strong {
@@ -211,15 +292,280 @@
 
     .section {
       padding: 74px 5vw;
+      position: relative;
     }
 
     .section.white {
-      background: #fff;
+      background: rgba(255, 255, 255, 0.72);
     }
+
+    #context {
+      display: grid;
+      grid-template-columns: minmax(320px, 0.84fr) minmax(0, 1.16fr);
+      gap: 34px;
+      align-items: center;
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.68), rgba(231, 251, 251, 0.42)),
+        linear-gradient(118deg, transparent 0 34%, rgba(18, 199, 199, 0.11) 34% 34.4%, transparent 34.4%);
+    }
+
+    #context .section-head {
+      margin-bottom: 0;
+    }
+
+    #context .insight-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      counter-reset: contextStep;
+    }
+
+    #context .card {
+      min-height: auto;
+      padding: 18px 18px 18px 68px;
+      position: relative;
+    }
+
+    #context .card:nth-child(2) {
+      margin-left: 34px;
+    }
+
+    #context .card:nth-child(3) {
+      margin-left: 68px;
+    }
+
+    #context .card::before {
+      counter-increment: contextStep;
+      content: "0" counter(contextStep);
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: #081018;
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 950;
+    }
+
+    #problem {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(246, 250, 251, 0.92)),
+        repeating-linear-gradient(90deg, rgba(9, 12, 18, 0.03) 0 1px, transparent 1px 80px);
+    }
+
+    #problem .card-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-auto-rows: minmax(176px, auto);
+    }
+
+    #problem .card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    #problem .card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 4px;
+      background: linear-gradient(90deg, var(--teal), rgba(18, 199, 199, 0.08));
+    }
+
+    #context .insight-grid {
+      position: relative;
+    }
+
+    #context .insight-grid::before {
+      content: "";
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      top: 50%;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(18, 199, 199, 0), rgba(18, 199, 199, 0.62), rgba(18, 199, 199, 0));
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    #context .card {
+      transform-origin: left center;
+    }
+
+    #context .card::after {
+      content: "";
+      position: absolute;
+      inset: auto 18px 18px;
+      height: 3px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--teal), rgba(18, 199, 199, 0));
+      transform: scaleX(0.42);
+      transform-origin: left center;
+      transition: transform 220ms var(--motion);
+    }
+
+    #context .card:hover::after {
+      transform: scaleX(1);
+    }
+
+    #problem .insight-grid {
+      perspective: 1000px;
+    }
+
+    #problem .card {
+      min-height: 176px;
+      transform-style: preserve-3d;
+      transition: transform 220ms var(--motion), box-shadow 220ms var(--motion), border-color 220ms var(--motion);
+    }
+
+    #problem .card:hover {
+      transform: translateY(-7px) scale(1.01);
+      border-color: rgba(18, 199, 199, 0.48);
+      box-shadow: 0 24px 54px rgba(10, 25, 34, 0.12);
+    }
+
+    #goals {
+      background:
+        linear-gradient(180deg, rgba(236, 246, 248, 0.68), rgba(255, 255, 255, 0.76)),
+        linear-gradient(90deg, transparent 0 9%, rgba(18, 199, 199, 0.18) 9% 9.2%, transparent 9.2% 100%);
+    }
+
+    #goals .card-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: stretch;
+      counter-reset: goalStep;
+    }
+
+    #goals .card {
+      padding-top: 56px;
+      border-radius: 18px 18px 8px 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #goals .card::before {
+      counter-increment: goalStep;
+      content: "0" counter(goalStep);
+      position: absolute;
+      top: 16px;
+      left: 18px;
+      color: rgba(18, 199, 199, 0.92);
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 950;
+    }
+
+    #goals .card::after {
+      content: "";
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      top: 44px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--teal), transparent);
+    }
+
+    #metrics {
+      background:
+        linear-gradient(135deg, #071018, #111d25 60%, #08393d);
+      color: #f7ffff;
+      overflow: hidden;
+    }
+
+    #metrics::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 82px),
+        repeating-linear-gradient(135deg, rgba(18, 199, 199, 0.07) 0 1px, transparent 1px 13px);
+    }
+
+    #metrics > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    #metrics .section-kicker {
+      color: #69f5f2;
+    }
+
+    #metrics .section-head p,
+    #metrics .metric-card p {
+      color: rgba(232, 255, 255, 0.72);
+    }
+
+    #metrics .metric-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    #metrics .metric-card {
+      min-height: 190px;
+      border-color: rgba(105, 245, 242, 0.22);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      box-shadow: none;
+      backdrop-filter: blur(12px);
+    }
+
+    #metrics .metric-card h3 {
+      color: #fff;
+    }
+
+    #demo {
+      order: 2;
+      padding-top: 64px;
+      padding-bottom: 88px;
+      background:
+        linear-gradient(135deg, rgba(5, 9, 14, 0.98), rgba(16, 25, 35, 0.96) 54%, rgba(7, 96, 100, 0.92)),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 58px);
+      color: #f7ffff;
+      overflow: hidden;
+    }
+
+    #demo::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(120deg, transparent 0 18%, rgba(18, 199, 199, 0.18) 18% 18.45%, transparent 18.45% 72%, rgba(255, 255, 255, 0.08) 72% 72.25%, transparent 72.25%),
+        repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 14px);
+      opacity: 0.9;
+    }
+
+    #demo > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    #context { order: 3; }
+    #problem { order: 4; }
+    #goals { order: 5; }
+    #metrics { order: 6; }
+    #prd { order: 7; }
 
     .section-head {
       max-width: 860px;
       margin-bottom: 28px;
+    }
+
+    #demo .section-head {
+      max-width: 980px;
+    }
+
+    #demo .section-head::after {
+      content: "";
+      display: block;
+      width: min(520px, 72vw);
+      height: 2px;
+      margin-top: 20px;
+      background: linear-gradient(90deg, transparent, var(--teal), transparent);
+      animation: stageSweep 3.8s var(--motion) infinite;
+      opacity: 0.75;
     }
 
     .section-kicker {
@@ -227,12 +573,14 @@
       color: #087f82;
       font-size: 13px;
       font-weight: 850;
+      letter-spacing: 0.03em;
     }
 
     .section h2 {
       margin: 0;
       font-size: clamp(28px, 3vw, 42px);
       line-height: 1.18;
+      text-wrap: balance;
     }
 
     .section-head p {
@@ -241,6 +589,18 @@
       color: #4d5564;
       font-size: 16px;
       line-height: 1.75;
+    }
+
+    #demo .section-kicker {
+      color: #69f5f2;
+    }
+
+    #demo > .section-head h2 {
+      color: #ffffff;
+    }
+
+    #demo .section-head p {
+      color: rgba(232, 255, 255, 0.78);
     }
 
     .insight-grid,
@@ -257,7 +617,16 @@
       padding: 18px;
       border: 1px solid var(--line);
       border-radius: 12px;
-      background: var(--panel);
+      background: rgba(255, 255, 255, 0.84);
+      box-shadow: 0 12px 28px rgba(10, 25, 34, 0.05);
+      transition: transform 220ms var(--motion), border-color 220ms var(--motion), box-shadow 220ms var(--motion);
+    }
+
+    .card:hover,
+    .metric-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(18, 199, 199, 0.34);
+      box-shadow: 0 18px 42px rgba(10, 25, 34, 0.09);
     }
 
     .card h3,
@@ -272,21 +641,41 @@
       color: var(--muted);
       font-size: 14px;
       line-height: 1.7;
+      text-wrap: pretty;
     }
 
     .demo-wrap {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 22px;
+      gap: 24px;
       align-items: stretch;
     }
 
     .demo-card {
-      padding: 18px;
-      border: 1px solid rgba(211, 218, 228, 0.9);
-      border-radius: 18px;
-      background: #fff;
-      box-shadow: var(--shadow);
+      padding: 20px;
+      border: 1px solid rgba(123, 244, 242, 0.26);
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(242, 253, 253, 0.94)),
+        repeating-linear-gradient(135deg, rgba(18, 199, 199, 0.035) 0 1px, transparent 1px 13px);
+      box-shadow: var(--stage-shadow);
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .demo-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 4px;
+      background: linear-gradient(90deg, var(--teal), rgba(255, 255, 255, 0.18), transparent);
+    }
+
+    #demo .demo-card:nth-child(2) {
+      border-color: rgba(105, 245, 242, 0.48);
+      box-shadow: 0 0 0 1px rgba(18, 199, 199, 0.12), 0 30px 90px rgba(18, 199, 199, 0.2), var(--stage-shadow);
+      transform: translateY(-6px);
     }
 
     .demo-title {
@@ -296,12 +685,76 @@
       gap: 12px;
       margin-bottom: 14px;
       font-weight: 900;
+      color: var(--ink);
     }
 
     .demo-title span {
       color: var(--muted);
       font-size: 12px;
       font-weight: 700;
+    }
+
+    .interactive-ribbon {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      width: fit-content;
+      max-width: 100%;
+      margin: -8px 0 22px;
+      padding: 10px 14px;
+      border: 1px solid rgba(105, 245, 242, 0.32);
+      border-radius: 999px;
+      background: rgba(6, 18, 24, 0.62);
+      color: rgba(244, 255, 255, 0.86);
+      font-size: 13px;
+      font-weight: 760;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 16px 34px rgba(3, 12, 20, 0.18);
+    }
+
+    .interactive-ribbon strong {
+      color: #69f5f2;
+      font-weight: 950;
+    }
+
+    .pulse-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 0 0 0 rgba(18, 199, 199, 0.55);
+      animation: tapPulse 1.45s ease-out infinite;
+      flex: 0 0 auto;
+    }
+
+    .interactive-phone-wrap {
+      display: grid;
+      gap: 10px;
+      justify-items: center;
+    }
+
+    .phone-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: #e9fbfb;
+      color: #087f82;
+      font-size: 12px;
+      font-weight: 900;
+      box-shadow: 0 0 0 1px rgba(18, 199, 199, 0.18);
+    }
+
+    .phone-hint::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 0 0 0 rgba(18, 199, 199, 0.5);
+      animation: tapPulse 1.45s ease-out infinite;
     }
 
     .old-phone {
@@ -312,6 +765,10 @@
       border: 10px solid #11131b;
       border-radius: 30px;
       background: #f5f6f9;
+      color: var(--ink);
+      box-shadow: 0 28px 60px rgba(0, 0, 0, 0.26);
+      transform: translateZ(0);
+      animation: phoneFloat 6s ease-in-out infinite;
     }
 
     .old-hero {
@@ -339,7 +796,7 @@
 
     .old-product {
       display: grid;
-      grid-template-columns: 68px 1fr;
+      grid-template-columns: 68px 1fr auto;
       gap: 12px;
       align-items: center;
       margin-bottom: 18px;
@@ -358,6 +815,13 @@
       font-weight: 950;
     }
 
+    .old-price-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      line-height: 1;
+    }
+
     .muted {
       color: var(--muted);
     }
@@ -367,6 +831,30 @@
       color: #888e9d;
       font-size: 15px;
       font-weight: 750;
+    }
+
+    .old-box-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .old-box {
+      min-width: 68px;
+      min-height: 44px;
+      padding: 0 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #eff2f6;
+      border-radius: 7px;
+      background: #fff;
+      color: #111722;
+      font-weight: 850;
+    }
+
+    .old-box.active {
+      border: 2px solid #11131b;
     }
 
     .pain-list {
@@ -443,14 +931,14 @@
     .comparison-column {
       display: grid;
       grid-template-columns: 390px minmax(220px, 1fr);
-      gap: 18px;
+      gap: 20px;
       align-items: start;
     }
 
     .demo-main {
       display: grid;
       grid-template-columns: 390px minmax(220px, 1fr);
-      gap: 18px;
+      gap: 20px;
       align-items: start;
     }
 
@@ -461,7 +949,10 @@
       border: 10px solid #11131b;
       border-radius: 34px;
       background: #f5f6f9;
-      box-shadow: 0 22px 55px rgba(7, 10, 18, 0.18);
+      color: var(--ink);
+      box-shadow: 0 28px 65px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(18, 199, 199, 0.16);
+      transform: translateZ(0);
+      animation: phoneFloat 6.5s ease-in-out infinite reverse;
     }
 
     #phoneRoot {
@@ -913,9 +1404,17 @@
       font-weight: 850;
     }
 
+    .all-link span:first-child {
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+
     .all-link span:last-child {
       color: #8c93a2;
       font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .ai-choices {
@@ -1162,9 +1661,20 @@
       background: #fff;
     }
 
+    #demo .flow-card {
+      border-color: rgba(18, 199, 199, 0.18);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(240, 253, 253, 0.86)),
+        repeating-linear-gradient(90deg, rgba(18, 199, 199, 0.035) 0 1px, transparent 1px 18px);
+      box-shadow: 0 14px 32px rgba(8, 22, 30, 0.07);
+    }
+
     .flow-card h3 {
       margin: 0 0 12px;
+      color: var(--ink);
       font-size: 16px;
+      font-weight: 950;
+      line-height: 1.25;
     }
 
     .step {
@@ -1188,6 +1698,12 @@
       color: #087f82;
       font-style: normal;
       font-weight: 950;
+    }
+
+    #demo .step i {
+      background: var(--teal);
+      color: #061116;
+      box-shadow: 0 0 0 4px rgba(18, 199, 199, 0.12);
     }
 
     .feature-list {
@@ -1271,7 +1787,8 @@
 
     .prd-page img {
       width: 100%;
-      max-height: 420px;
+      height: auto;
+      max-height: none;
       object-fit: contain;
       margin: 12px 0 18px;
       border: 1px solid var(--line);
@@ -1322,10 +1839,43 @@
 
     .asset-link {
       display: block;
+      width: 100%;
+      text-align: left;
       padding: 16px;
+      padding-right: 54px;
       border: 1px solid var(--line);
       border-radius: 12px;
       background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 180ms var(--motion), border-color 180ms var(--motion), box-shadow 180ms var(--motion), background 180ms var(--motion);
+    }
+
+    .asset-link::after {
+      content: "打开";
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      min-width: 34px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: rgba(18, 199, 199, 0.12);
+      color: var(--teal-dark);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .asset-link:hover,
+    .asset-link:focus-visible {
+      transform: translateY(-2px);
+      border-color: rgba(18, 199, 199, 0.55);
+      background: linear-gradient(180deg, #fff, #effefe);
+      box-shadow: 0 14px 34px rgba(10, 25, 34, 0.1);
+      outline: none;
     }
 
     .asset-link strong {
@@ -1346,6 +1896,65 @@
       font-size: 13px;
     }
 
+    @keyframes phoneFloat {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    @keyframes stageSweep {
+      0% {
+        transform: translateX(-120%);
+      }
+      100% {
+        transform: translateX(120%);
+      }
+    }
+
+    @keyframes tapPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(18, 199, 199, 0.55);
+      }
+      72% {
+        box-shadow: 0 0 0 10px rgba(18, 199, 199, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(18, 199, 199, 0);
+      }
+    }
+
+    .reveal-ready .hero > *,
+    .reveal-ready .section-head,
+    .reveal-ready .card,
+    .reveal-ready .metric-card,
+    .reveal-ready .demo-card,
+    .reveal-ready .prd-browser,
+    .reveal-ready .asset-panel,
+    .reveal-ready .asset-link {
+      opacity: 1;
+      transform: translateY(14px);
+      transition: opacity 640ms var(--motion), transform 640ms var(--motion);
+    }
+
+    .reveal-ready .is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+
     @media (max-width: 1180px) {
       .hero,
       .demo-wrap,
@@ -1359,6 +1968,24 @@
       .phone,
       .old-phone {
         margin: 0 auto;
+      }
+
+      #context,
+      #problem .card-grid,
+      #goals .card-grid,
+      #metrics .metric-grid,
+      .asset-grid {
+        grid-template-columns: 1fr;
+      }
+
+      #context .card,
+      #context .card:nth-child(2),
+      #context .card:nth-child(3) {
+        margin-left: 0;
+      }
+
+      #demo .demo-card:nth-child(2) {
+        transform: none;
       }
 
       .feature-list {
@@ -1388,6 +2015,12 @@
         padding-right: 18px;
       }
 
+      .hero {
+        min-height: auto;
+        padding-top: 36px;
+        padding-bottom: 36px;
+      }
+
       .insight-grid,
       .card-grid,
       .metric-grid,
@@ -1415,10 +2048,10 @@
     </a>
     <nav class="nav" aria-label="页面导航">
       <a href="#overview">项目概述</a>
+      <a href="#demo">方案交互 Demo</a>
       <a href="#context">业务背景与产品现状</a>
       <a href="#problem">核心问题定义</a>
       <a href="#goals">项目目标与方案边界</a>
-      <a href="#demo">方案交互 Demo</a>
       <a href="#metrics">数据指标与风险应对</a>
       <a href="#prd">PRD 与原型资料</a>
     </nav>
@@ -1431,11 +2064,11 @@
         <h1>把复杂购买选项，转译成用户能放心下单的选择。</h1>
         <p class="lead">本项目围绕得物“尺码 + 购买选项页”，设计「选项怎么选」能力。在不暴露具体供应商身份、不破坏平台统一正品心智的前提下，帮助用户理解不同购买选项的渠道、成色、时效、查验和售后差异，降低正品焦虑与售后预期偏差，提升下单决策效率。</p>
         <div class="hero-actions">
-          <a class="btn primary compact" href="#overview">项目概述</a>
+          <a class="btn compact" href="#overview">项目概述</a>
+          <a class="btn primary compact" href="#demo">方案交互 Demo</a>
           <a class="btn compact" href="#context">业务背景与产品现状</a>
           <a class="btn compact" href="#problem">核心问题定义</a>
           <a class="btn compact" href="#goals">项目目标与方案边界</a>
-          <a class="btn compact" href="#demo">方案交互 Demo</a>
           <a class="btn compact" href="#metrics">数据指标与风险应对</a>
           <a class="btn compact" href="#prd">PRD 与原型资料</a>
         </div>
@@ -1469,15 +2102,15 @@
       <div class="insight-grid">
         <article class="card">
           <h3>前台可见信息</h3>
-          <p>消费者能看到渠道标签、成色标签、价格、购买选项颜色和物流时效，但普通渠道、具体履约模式和不支持项通常不显性展示。</p>
+          <p>前台能看到渠道/成色标签、价格、选项颜色与物流时效；普通渠道、履约模式、不支持项通常不显性展示。</p>
         </article>
         <article class="card">
           <h3>后台履约被封装</h3>
-          <p>品牌入仓、品牌现货、品牌直发、闪电直发等后台履约词不适合直接前台化，更适合转译为查验链路和时效原因。</p>
+          <p>后台履约词如品牌入仓、品牌现货、品牌直发、闪电直发，不直接前台化，而转译为查验链路与时效原因。</p>
         </article>
         <article class="card">
           <h3>统一心智与差异决策</h3>
-          <p>平台需要维持“得物统一正品保障”的信任底座，同时让用户理解不同选项在渠道、成色、时效和售后上的实际差异。</p>
+          <p>平台维持“得物统一正品保障”的信任底座，同时解释不同选项在渠道、成色、时效和售后上的差异。</p>
         </article>
       </div>
     </section>
@@ -1531,6 +2164,7 @@
         <h2>左侧是旧版问题，右侧是新版购买链路。</h2>
         <p>新版链路保持“立即购买 → 尺码与购买选项 → 确认订单”的主路径，只新增「选项怎么选」作为辅助决策入口。购买选项仍可直接下单，辅助页内采用“先选中查看完整信息，再确认该选项”的两步交互。</p>
       </div>
+      <div class="interactive-ribbon"><span class="pulse-dot"></span><strong>右侧手机可交互</strong><span>点击「选项怎么选」、底部购买选项、对比卡片、标签 chip 和 AI 偏好，可模拟完整跳转链路。</span></div>
 
       <div class="demo-wrap">
         <div class="demo-card">
@@ -1544,16 +2178,21 @@
                 <div class="old-product">
                   <img src="assets/bracelet.jpg" alt="商品缩略图" />
                   <div>
-                    <div class="old-price">¥471</div>
+                    <div class="old-price-line"><span class="dewu-mark">得物</span><span class="old-price">¥471</span></div>
                     <div class="muted">已选 金色 F 默认包装</div>
                   </div>
+                  <div class="qty"><span>−</span><b>1</b><span>＋</span></div>
+                </div>
+                <div class="old-block-title">款式</div>
+                <div class="old-box-row">
+                  <div class="old-box active">金色</div>
+                  <div class="old-box">玫瑰金色</div>
+                </div>
+                <div class="old-block-title">尺码</div>
+                <div class="old-box-row">
+                  <div class="old-box active">F</div>
                 </div>
                 <div class="old-block-title">购买选项</div>
-                <div class="pain-list">
-                  <div class="pain">标签展示在选项上，但用户无法在当前场景理解“品牌官方”“品牌专供”“95 分”的规则差异。</div>
-                  <div class="pain">物流时效隐藏了履约模式，快到货选项可能被误解为未经过查验。</div>
-                  <div class="pain">售后权益只展示支持项，不支持项不会强提示，用户需要自行继续确认。</div>
-                </div>
                 <div class="old-options">
                   <div class="old-option teal"><span class="old-tag">品牌官方</span><b>¥476</b><span>约2天到</span></div>
                   <div class="old-option dark"><span class="old-tag">品牌专供</span><b>¥471</b><span>约5-6天到</span></div>
@@ -1579,8 +2218,11 @@
             <button class="btn" type="button" id="resetDemo">重置 Demo</button>
           </div>
           <div class="demo-main">
-            <div class="phone" aria-live="polite">
-              <div id="phoneRoot"></div>
+            <div class="interactive-phone-wrap">
+              <div class="phone-hint">点击手机内按钮试试</div>
+              <div class="phone" aria-live="polite">
+                <div id="phoneRoot"></div>
+              </div>
             </div>
             <aside class="demo-side">
               <div class="flow-card">
@@ -1650,14 +2292,14 @@
           <img src="assets/prototype-overview.png" alt="得物 Buybox 购买选项决策体验优化终版原型总览" />
         </div>
         <div class="asset-links">
-          <a class="asset-link" href="assets/prototype-overview.png" target="_blank" rel="noreferrer">
+          <button class="asset-link" type="button" data-open-file="./assets/prototype-overview.png">
             <strong>打开终版原型总览图</strong>
             <span>包含购买选项入口态、选项怎么选、AI 推荐态和全部标签说明页。</span>
-          </a>
-          <a class="asset-link" href="prd.md" target="_blank" rel="noreferrer">
+          </button>
+          <button class="asset-link" type="button" data-open-file="./prd.md">
             <strong>打开 Markdown 备份</strong>
             <span>保留完整文档源文件，便于进一步编辑和迁移到飞书文档。</span>
-          </a>
+          </button>
         </div>
       </div>
     </section>
@@ -1791,7 +2433,7 @@
       },
       {
         title: "11. 原型设计说明",
-        body: `<p>终版原型覆盖四个关键状态：购买选项页入口态、选项怎么选页 chip 展开态、AI 推荐结果态、购买选项说明页。</p><img src="assets/prototype-overview.png" alt="终版原型总览" /><ul><li>入口态：购买选项页只保留一个「选项怎么选」入口。</li><li>Chip 展开态：当前选项对比中点击标签，就地解释渠道、查验或售后含义。</li><li>AI 推荐态：用户选择偏好后展示推荐理由和取舍。</li><li>说明页：按渠道、成色、查验时效、售后权益分类展示全量说明。</li></ul>`
+        body: `<p>终版原型覆盖四个关键状态：购买选项页入口态、选项怎么选页 chip 展开态、AI 推荐结果态、购买选项说明页。核心交互已在上方「方案交互 Demo」中以可点击链路呈现。</p><ul><li>入口态：购买选项页只保留一个「选项怎么选」入口。</li><li>Chip 展开态：当前选项对比中点击标签，就地解释渠道、查验或售后含义。</li><li>AI 推荐态：用户选择偏好后展示推荐理由和取舍。</li><li>说明页：按渠道、成色、查验时效、售后权益分类展示全量说明。</li></ul>`
       }
     ];
 
@@ -2185,6 +2827,13 @@
       renderPhone();
     });
 
+    document.querySelectorAll("[data-open-file]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = new URL(button.dataset.openFile, window.location.href).href;
+        window.location.assign(target);
+      });
+    });
+
     function renderPrd() {
       const tabs = document.getElementById("prdTabs");
       const page = document.getElementById("prdPage");
@@ -2202,8 +2851,159 @@
       `;
     }
 
+    function setupRevealMotion() {
+      const targets = document.querySelectorAll(".hero > *, .section-head, .card, .metric-card, .demo-card, .prd-browser, .asset-panel, .asset-link");
+      document.body.classList.add("reveal-ready");
+      if (!("IntersectionObserver" in window)) {
+        targets.forEach((target) => target.classList.add("is-visible"));
+        return;
+      }
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+      targets.forEach((target, index) => {
+        target.style.transitionDelay = `${Math.min(index % 6, 5) * 45}ms`;
+        observer.observe(target);
+        const rect = target.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          target.classList.add("is-visible");
+          observer.unobserve(target);
+        }
+      });
+    }
+
+    function loadExternalScript(src) {
+      return new Promise((resolve, reject) => {
+        if (document.querySelector(`script[src="${src}"]`)) {
+          resolve();
+          return;
+        }
+        const script = document.createElement("script");
+        script.src = src;
+        script.async = true;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+
+    function setupGsapShowcaseMotion() {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const gsapUrl = "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js";
+      const scrollTriggerUrl = "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js";
+      loadExternalScript(gsapUrl)
+        .then(() => loadExternalScript(scrollTriggerUrl))
+        .then(() => {
+          if (!window.gsap || !window.ScrollTrigger) return;
+          const gsap = window.gsap;
+          const ScrollTrigger = window.ScrollTrigger;
+          gsap.registerPlugin(ScrollTrigger);
+          gsap.defaults({ duration: 0.72, ease: "power3.out" });
+
+          gsap.from(".hero .eyebrow, .hero h1, .hero .lead, .hero-actions .btn, .hero-card", {
+            autoAlpha: 0,
+            y: 26,
+            stagger: 0.07,
+            clearProps: "all"
+          });
+
+          gsap.from("#demo .demo-card:first-child", {
+            autoAlpha: 0,
+            x: -70,
+            rotation: -1.2,
+            scrollTrigger: { trigger: "#demo", start: "top 74%", once: true },
+            clearProps: "all"
+          });
+
+          gsap.from("#demo .demo-card:nth-child(2)", {
+            autoAlpha: 0,
+            x: 70,
+            rotation: 1.2,
+            delay: 0.08,
+            scrollTrigger: { trigger: "#demo", start: "top 74%", once: true },
+            clearProps: "all"
+          });
+
+          gsap.to("#demo .phone", {
+            y: -6,
+            duration: 2.8,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+          });
+
+          gsap.from("#context .card", {
+            autoAlpha: 0,
+            x: (index) => index % 2 === 0 ? -46 : 46,
+            skewX: (index) => index % 2 === 0 ? -2 : 2,
+            stagger: 0.12,
+            scrollTrigger: { trigger: "#context", start: "top 76%", once: true },
+            clearProps: "all"
+          });
+
+          gsap.from("#problem .card", {
+            autoAlpha: 0,
+            scale: 0.9,
+            y: 28,
+            filter: "blur(8px)",
+            stagger: { each: 0.1, from: "center" },
+            scrollTrigger: { trigger: "#problem", start: "top 76%", once: true },
+            clearProps: "all"
+          });
+
+          gsap.from("#goals .card", {
+            autoAlpha: 0,
+            y: 52,
+            rotationX: -12,
+            transformPerspective: 900,
+            transformOrigin: "top center",
+            stagger: 0.12,
+            scrollTrigger: { trigger: "#goals", start: "top 78%", once: true },
+            clearProps: "all"
+          });
+
+          gsap.from("#metrics .metric-card", {
+            autoAlpha: 0,
+            y: 34,
+            rotationY: (index) => index % 2 === 0 ? -10 : 10,
+            transformPerspective: 900,
+            stagger: 0.07,
+            scrollTrigger: { trigger: "#metrics", start: "top 78%", once: true },
+            clearProps: "all"
+          });
+
+          gsap.from("#prd .prd-tab", {
+            autoAlpha: 0,
+            x: -18,
+            stagger: 0.04,
+            scrollTrigger: { trigger: "#prd", start: "top 76%", once: true },
+            clearProps: "all"
+          });
+
+          gsap.from("#prd .prd-browser, #prd .asset-panel, #prd .asset-link", {
+            autoAlpha: 0,
+            y: 30,
+            stagger: 0.08,
+            scrollTrigger: {
+              trigger: "#prd",
+              start: "top 76%",
+              once: true
+            },
+            clearProps: "all"
+          });
+        })
+        .catch(() => {});
+    }
+
     renderPhone();
     renderPrd();
+    setupRevealMotion();
+    window.addEventListener("load", setupGsapShowcaseMotion);
   </script>
 </body>
 </html>
