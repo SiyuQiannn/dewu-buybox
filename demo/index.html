@@ -3,3007 +3,433 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>得物 Buybox 购买选项决策体验优化</title>
-  <meta name="description" content="围绕得物多购买选项场景的电商产品项目，通过选项对比、标签解释、AI 帮我选与确认订单链路，降低用户决策成本。" />
-  <style>
-    :root {
-      --bg: #eef4f5;
-      --panel: #ffffff;
-      --ink: #10131c;
-      --muted: #6c7280;
-      --line: #e3e8ef;
-      --soft: #f7f8fb;
-      --teal: #12c7c7;
-      --teal-dark: #009da0;
-      --blue: #12c7c7;
-      --dark: #24242f;
-      --gray: #474c5f;
-      --dewu-ink: #090c12;
-      --dewu-cyan-soft: #e7fbfb;
-      --track: rgba(18, 199, 199, 0.16);
-      --shadow: 0 18px 42px rgba(21, 29, 48, 0.12);
-      --stage-shadow: 0 26px 80px rgba(3, 12, 20, 0.28);
-      --motion: cubic-bezier(0.2, 0.75, 0.2, 1);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      scroll-padding-top: 84px;
-    }
-
-    body {
-      margin: 0;
-      background:
-        linear-gradient(180deg, rgba(232, 244, 246, 0.9), rgba(246, 249, 249, 1) 28%, rgba(237, 244, 246, 1) 100%);
-      color: var(--ink);
-      font-family: "MiSans", "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      letter-spacing: 0;
-      position: relative;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: -2;
-      pointer-events: none;
-      background:
-        linear-gradient(118deg, transparent 0 28%, rgba(18, 199, 199, 0.11) 28% 29%, transparent 29% 61%, rgba(9, 12, 18, 0.05) 61% 61.6%, transparent 61.6%),
-        repeating-linear-gradient(90deg, rgba(10, 18, 24, 0.028) 0 1px, transparent 1px 72px);
-    }
-
-    body::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      background: repeating-linear-gradient(135deg, rgba(18, 199, 199, 0.035) 0 1px, transparent 1px 12px);
-      opacity: 0.65;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    button {
-      font: inherit;
-    }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 5vw;
-      background: rgba(242, 248, 249, 0.82);
-      border-bottom: 1px solid rgba(178, 204, 211, 0.5);
-      backdrop-filter: blur(22px);
-    }
-
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 850;
-      white-space: nowrap;
-    }
-
-    .brand-mark {
-      width: 32px;
-      height: 32px;
-      display: grid;
-      place-items: center;
-      border-radius: 9px;
-      background: linear-gradient(135deg, var(--dewu-ink), #1f2630);
-      color: #fff;
-      font-size: 13px;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 0 3px rgba(18, 199, 199, 0.11);
-    }
-
-    .nav {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #4e5563;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .nav a {
-      padding: 8px 10px;
-      border-radius: 999px;
-      transition: background 180ms var(--motion), color 180ms var(--motion), transform 180ms var(--motion);
-      white-space: nowrap;
-    }
-
-    .nav a:hover {
-      background: rgba(18, 199, 199, 0.1);
-      color: var(--teal-dark);
-      transform: translateY(-1px);
-    }
-
-    main {
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .hero {
-      order: 1;
-      min-height: clamp(560px, 66vh, 680px);
-      padding: 52px 5vw 42px;
-      display: grid;
-      grid-template-columns: minmax(360px, 0.92fr) minmax(420px, 1.08fr);
-      gap: 38px;
-      align-items: center;
-      position: relative;
-    }
-
-    .hero::after {
-      content: "";
-      position: absolute;
-      left: 5vw;
-      right: 5vw;
-      bottom: 14px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(18, 199, 199, 0.7), rgba(9, 12, 18, 0.16), transparent);
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      min-height: 30px;
-      padding: 0 12px;
-      border: 1px solid #c5eff0;
-      border-radius: 999px;
-      background: rgba(231, 251, 251, 0.82);
-      color: #087f82;
-      font-size: 13px;
-      font-weight: 800;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8);
-    }
-
-    h1 {
-      max-width: 760px;
-      margin: 18px 0 16px;
-      font-size: clamp(38px, 4.7vw, 64px);
-      line-height: 1.08;
-      letter-spacing: 0;
-      text-wrap: balance;
-      background: linear-gradient(110deg, #090c12 0%, #090c12 54%, #078f92 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .lead {
-      max-width: 760px;
-      margin: 0;
-      color: #4c5463;
-      font-size: 18px;
-      line-height: 1.75;
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 28px;
-    }
-
-    .btn {
-      height: 44px;
-      padding: 0 18px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid #cfd6df;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.78);
-      color: var(--ink);
-      font-weight: 850;
-      cursor: pointer;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
-      transition: transform 180ms var(--motion), border-color 180ms var(--motion), background 180ms var(--motion), box-shadow 180ms var(--motion);
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      border-color: #aeb8c7;
-      box-shadow: 0 10px 28px rgba(12, 24, 32, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    }
-
-    .btn.primary {
-      border-color: var(--teal);
-      background: var(--teal);
-      color: #fff;
-      box-shadow: 0 0 0 4px rgba(18, 199, 199, 0.12), 0 14px 30px rgba(18, 199, 199, 0.22);
-    }
-
-    .btn.compact {
-      height: 38px;
-      padding: 0 12px;
-      font-size: 13px;
-    }
-
-    .hero-card {
-      padding: 22px;
-      border: 1px solid rgba(196, 226, 230, 0.9);
-      border-radius: 20px;
-      background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.93), rgba(247, 252, 252, 0.88)),
-        repeating-linear-gradient(135deg, rgba(18, 199, 199, 0.04) 0 1px, transparent 1px 12px);
-      box-shadow: 0 26px 68px rgba(7, 20, 30, 0.12);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-card::before {
-      content: "";
-      position: absolute;
-      inset: 0 0 auto;
-      height: 5px;
-      background: linear-gradient(90deg, var(--teal), rgba(18, 199, 199, 0.1), var(--dewu-ink));
-    }
-
-    .hero-card h2 {
-      margin: 0 0 16px;
-      font-size: 22px;
-    }
-
-    .logic-list {
-      display: grid;
-      gap: 12px;
-    }
-
-    .logic-item {
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.86);
-      transition: transform 180ms var(--motion), border-color 180ms var(--motion);
-    }
-
-    .logic-item:hover {
-      transform: translateX(4px);
-      border-color: rgba(18, 199, 199, 0.42);
-    }
-
-    .logic-item strong {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 15px;
-    }
-
-    .logic-item span {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.55;
-    }
-
-    .section {
-      padding: 74px 5vw;
-      position: relative;
-    }
-
-    .section.white {
-      background: rgba(255, 255, 255, 0.72);
-    }
-
-    #context {
-      display: grid;
-      grid-template-columns: minmax(320px, 0.84fr) minmax(0, 1.16fr);
-      gap: 34px;
-      align-items: center;
-      background:
-        linear-gradient(90deg, rgba(255, 255, 255, 0.68), rgba(231, 251, 251, 0.42)),
-        linear-gradient(118deg, transparent 0 34%, rgba(18, 199, 199, 0.11) 34% 34.4%, transparent 34.4%);
-    }
-
-    #context .section-head {
-      margin-bottom: 0;
-    }
-
-    #context .insight-grid {
-      grid-template-columns: 1fr;
-      gap: 12px;
-      counter-reset: contextStep;
-    }
-
-    #context .card {
-      min-height: auto;
-      padding: 18px 18px 18px 68px;
-      position: relative;
-    }
-
-    #context .card:nth-child(2) {
-      margin-left: 34px;
-    }
-
-    #context .card:nth-child(3) {
-      margin-left: 68px;
-    }
-
-    #context .card::before {
-      counter-increment: contextStep;
-      content: "0" counter(contextStep);
-      position: absolute;
-      left: 18px;
-      top: 18px;
-      width: 34px;
-      height: 34px;
-      display: grid;
-      place-items: center;
-      border-radius: 10px;
-      background: #081018;
-      color: var(--teal);
-      font-size: 13px;
-      font-weight: 950;
-    }
-
-    #problem {
-      background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(246, 250, 251, 0.92)),
-        repeating-linear-gradient(90deg, rgba(9, 12, 18, 0.03) 0 1px, transparent 1px 80px);
-    }
-
-    #problem .card-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      grid-auto-rows: minmax(176px, auto);
-    }
-
-    #problem .card {
-      position: relative;
-      overflow: hidden;
-    }
-
-    #problem .card::before {
-      content: "";
-      position: absolute;
-      inset: 0 0 auto;
-      height: 4px;
-      background: linear-gradient(90deg, var(--teal), rgba(18, 199, 199, 0.08));
-    }
-
-    #context .insight-grid {
-      position: relative;
-    }
-
-    #context .insight-grid::before {
-      content: "";
-      position: absolute;
-      left: 12px;
-      right: 12px;
-      top: 50%;
-      height: 1px;
-      background: linear-gradient(90deg, rgba(18, 199, 199, 0), rgba(18, 199, 199, 0.62), rgba(18, 199, 199, 0));
-      transform: translateY(-50%);
-      pointer-events: none;
-    }
-
-    #context .card {
-      transform-origin: left center;
-    }
-
-    #context .card::after {
-      content: "";
-      position: absolute;
-      inset: auto 18px 18px;
-      height: 3px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--teal), rgba(18, 199, 199, 0));
-      transform: scaleX(0.42);
-      transform-origin: left center;
-      transition: transform 220ms var(--motion);
-    }
-
-    #context .card:hover::after {
-      transform: scaleX(1);
-    }
-
-    #problem .insight-grid {
-      perspective: 1000px;
-    }
-
-    #problem .card {
-      min-height: 176px;
-      transform-style: preserve-3d;
-      transition: transform 220ms var(--motion), box-shadow 220ms var(--motion), border-color 220ms var(--motion);
-    }
-
-    #problem .card:hover {
-      transform: translateY(-7px) scale(1.01);
-      border-color: rgba(18, 199, 199, 0.48);
-      box-shadow: 0 24px 54px rgba(10, 25, 34, 0.12);
-    }
-
-    #goals {
-      background:
-        linear-gradient(180deg, rgba(236, 246, 248, 0.68), rgba(255, 255, 255, 0.76)),
-        linear-gradient(90deg, transparent 0 9%, rgba(18, 199, 199, 0.18) 9% 9.2%, transparent 9.2% 100%);
-    }
-
-    #goals .card-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      align-items: stretch;
-      counter-reset: goalStep;
-    }
-
-    #goals .card {
-      padding-top: 56px;
-      border-radius: 18px 18px 8px 8px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    #goals .card::before {
-      counter-increment: goalStep;
-      content: "0" counter(goalStep);
-      position: absolute;
-      top: 16px;
-      left: 18px;
-      color: rgba(18, 199, 199, 0.92);
-      font-size: 28px;
-      line-height: 1;
-      font-weight: 950;
-    }
-
-    #goals .card::after {
-      content: "";
-      position: absolute;
-      left: 18px;
-      right: 18px;
-      top: 44px;
-      height: 2px;
-      background: linear-gradient(90deg, var(--teal), transparent);
-    }
-
-    #metrics {
-      background:
-        linear-gradient(135deg, #071018, #111d25 60%, #08393d);
-      color: #f7ffff;
-      overflow: hidden;
-    }
-
-    #metrics::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background:
-        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 82px),
-        repeating-linear-gradient(135deg, rgba(18, 199, 199, 0.07) 0 1px, transparent 1px 13px);
-    }
-
-    #metrics > * {
-      position: relative;
-      z-index: 1;
-    }
-
-    #metrics .section-kicker {
-      color: #69f5f2;
-    }
-
-    #metrics .section-head p,
-    #metrics .metric-card p {
-      color: rgba(232, 255, 255, 0.72);
-    }
-
-    #metrics .metric-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    #metrics .metric-card {
-      min-height: 190px;
-      border-color: rgba(105, 245, 242, 0.22);
-      background: rgba(255, 255, 255, 0.08);
-      color: #fff;
-      box-shadow: none;
-      backdrop-filter: blur(12px);
-    }
-
-    #metrics .metric-card h3 {
-      color: #fff;
-    }
-
-    #demo {
-      order: 2;
-      padding-top: 64px;
-      padding-bottom: 88px;
-      background:
-        linear-gradient(135deg, rgba(5, 9, 14, 0.98), rgba(16, 25, 35, 0.96) 54%, rgba(7, 96, 100, 0.92)),
-        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 58px);
-      color: #f7ffff;
-      overflow: hidden;
-    }
-
-    #demo::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background:
-        linear-gradient(120deg, transparent 0 18%, rgba(18, 199, 199, 0.18) 18% 18.45%, transparent 18.45% 72%, rgba(255, 255, 255, 0.08) 72% 72.25%, transparent 72.25%),
-        repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 14px);
-      opacity: 0.9;
-    }
-
-    #demo > * {
-      position: relative;
-      z-index: 1;
-    }
-
-    #context { order: 3; }
-    #problem { order: 4; }
-    #goals { order: 5; }
-    #metrics { order: 6; }
-    #prd { order: 7; }
-
-    .section-head {
-      max-width: 860px;
-      margin-bottom: 28px;
-    }
-
-    #demo .section-head {
-      max-width: 980px;
-    }
-
-    #demo .section-head::after {
-      content: "";
-      display: block;
-      width: min(520px, 72vw);
-      height: 2px;
-      margin-top: 20px;
-      background: linear-gradient(90deg, transparent, var(--teal), transparent);
-      animation: stageSweep 3.8s var(--motion) infinite;
-      opacity: 0.75;
-    }
-
-    .section-kicker {
-      margin-bottom: 10px;
-      color: #087f82;
-      font-size: 13px;
-      font-weight: 850;
-      letter-spacing: 0.03em;
-    }
-
-    .section h2 {
-      margin: 0;
-      font-size: clamp(28px, 3vw, 42px);
-      line-height: 1.18;
-      text-wrap: balance;
-    }
-
-    .section-head p {
-      max-width: 820px;
-      margin: 12px 0 0;
-      color: #4d5564;
-      font-size: 16px;
-      line-height: 1.75;
-    }
-
-    #demo .section-kicker {
-      color: #69f5f2;
-    }
-
-    #demo > .section-head h2 {
-      color: #ffffff;
-    }
-
-    #demo .section-head p {
-      color: rgba(232, 255, 255, 0.78);
-    }
-
-    .insight-grid,
-    .card-grid,
-    .metric-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .card,
-    .metric-card {
-      min-height: 150px;
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.84);
-      box-shadow: 0 12px 28px rgba(10, 25, 34, 0.05);
-      transition: transform 220ms var(--motion), border-color 220ms var(--motion), box-shadow 220ms var(--motion);
-    }
-
-    .card:hover,
-    .metric-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(18, 199, 199, 0.34);
-      box-shadow: 0 18px 42px rgba(10, 25, 34, 0.09);
-    }
-
-    .card h3,
-    .metric-card h3 {
-      margin: 0 0 10px;
-      font-size: 18px;
-    }
-
-    .card p,
-    .metric-card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.7;
-      text-wrap: pretty;
-    }
-
-    .demo-wrap {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 24px;
-      align-items: stretch;
-    }
-
-    .demo-card {
-      padding: 20px;
-      border: 1px solid rgba(123, 244, 242, 0.26);
-      border-radius: 22px;
-      background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(242, 253, 253, 0.94)),
-        repeating-linear-gradient(135deg, rgba(18, 199, 199, 0.035) 0 1px, transparent 1px 13px);
-      box-shadow: var(--stage-shadow);
-      position: relative;
-      overflow: hidden;
-      isolation: isolate;
-    }
-
-    .demo-card::before {
-      content: "";
-      position: absolute;
-      inset: 0 0 auto;
-      height: 4px;
-      background: linear-gradient(90deg, var(--teal), rgba(255, 255, 255, 0.18), transparent);
-    }
-
-    #demo .demo-card:nth-child(2) {
-      border-color: rgba(105, 245, 242, 0.48);
-      box-shadow: 0 0 0 1px rgba(18, 199, 199, 0.12), 0 30px 90px rgba(18, 199, 199, 0.2), var(--stage-shadow);
-      transform: translateY(-6px);
-    }
-
-    .demo-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 14px;
-      font-weight: 900;
-      color: var(--ink);
-    }
-
-    .demo-title span {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .interactive-ribbon {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 10px;
-      width: fit-content;
-      max-width: 100%;
-      margin: -8px 0 22px;
-      padding: 10px 14px;
-      border: 1px solid rgba(105, 245, 242, 0.32);
-      border-radius: 999px;
-      background: rgba(6, 18, 24, 0.62);
-      color: rgba(244, 255, 255, 0.86);
-      font-size: 13px;
-      font-weight: 760;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 16px 34px rgba(3, 12, 20, 0.18);
-    }
-
-    .interactive-ribbon strong {
-      color: #69f5f2;
-      font-weight: 950;
-    }
-
-    .pulse-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: var(--teal);
-      box-shadow: 0 0 0 0 rgba(18, 199, 199, 0.55);
-      animation: tapPulse 1.45s ease-out infinite;
-      flex: 0 0 auto;
-    }
-
-    .interactive-phone-wrap {
-      display: grid;
-      gap: 10px;
-      justify-items: center;
-    }
-
-    .phone-hint {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      min-height: 30px;
-      padding: 0 12px;
-      border-radius: 999px;
-      background: #e9fbfb;
-      color: #087f82;
-      font-size: 12px;
-      font-weight: 900;
-      box-shadow: 0 0 0 1px rgba(18, 199, 199, 0.18);
-    }
-
-    .phone-hint::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--teal);
-      box-shadow: 0 0 0 0 rgba(18, 199, 199, 0.5);
-      animation: tapPulse 1.45s ease-out infinite;
-    }
-
-    .old-phone {
-      width: 390px;
-      position: relative;
-      height: 760px;
-      overflow: hidden;
-      border: 10px solid #11131b;
-      border-radius: 30px;
-      background: #f5f6f9;
-      color: var(--ink);
-      box-shadow: 0 28px 60px rgba(0, 0, 0, 0.26);
-      transform: translateZ(0);
-      animation: phoneFloat 6s ease-in-out infinite;
-    }
-
-    .old-hero {
-      height: 150px;
-      background: #d7dade;
-    }
-
-    .old-hero img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: brightness(0.68);
-    }
-
-    .old-sheet {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 600px;
-      padding: 16px;
-      border-radius: 24px 24px 0 0;
-      background: #fff;
-    }
-
-    .old-product {
-      display: grid;
-      grid-template-columns: 68px 1fr auto;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 18px;
-    }
-
-    .old-product img {
-      width: 68px;
-      height: 68px;
-      object-fit: cover;
-      border: 1px solid #edf0f4;
-      border-radius: 8px;
-    }
-
-    .old-price {
-      font-size: 34px;
-      font-weight: 950;
-    }
-
-    .old-price-line {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      line-height: 1;
-    }
-
-    .muted {
-      color: var(--muted);
-    }
-
-    .old-block-title {
-      margin: 18px 0 10px;
-      color: #888e9d;
-      font-size: 15px;
-      font-weight: 750;
-    }
-
-    .old-box-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .old-box {
-      min-width: 68px;
-      min-height: 44px;
-      padding: 0 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid #eff2f6;
-      border-radius: 7px;
-      background: #fff;
-      color: #111722;
-      font-weight: 850;
-    }
-
-    .old-box.active {
-      border: 2px solid #11131b;
-    }
-
-    .pain-list {
-      display: grid;
-      gap: 10px;
-    }
-
-    .pain {
-      padding: 12px;
-      border: 1px solid #eceff4;
-      border-radius: 10px;
-      background: #fafbfe;
-      color: #596172;
-      font-size: 13px;
-      line-height: 1.55;
-    }
-
-    .old-options {
-      position: absolute;
-      left: 16px;
-      right: 16px;
-      bottom: 18px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-
-    .old-option {
-      position: relative;
-      min-height: 78px;
-      padding: 22px 10px 10px;
-      border-radius: 8px;
-      color: #fff;
-      overflow: hidden;
-    }
-
-    .old-option.teal {
-      background: var(--teal);
-    }
-
-    .old-option.dark {
-      background: var(--dark);
-    }
-
-    .old-option.gray {
-      background: var(--gray);
-    }
-
-    .old-tag {
-      position: absolute;
-      top: 6px;
-      right: 6px;
-      max-width: 92px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: rgba(0, 0, 0, 0.18);
-      font-size: 11px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .old-option b {
-      display: block;
-      font-size: 22px;
-      line-height: 1.1;
-    }
-
-    .old-option span:last-child {
-      font-size: 12px;
-      opacity: 0.88;
-    }
-
-    .comparison-column {
-      display: grid;
-      grid-template-columns: 390px minmax(220px, 1fr);
-      gap: 20px;
-      align-items: start;
-    }
-
-    .demo-main {
-      display: grid;
-      grid-template-columns: 390px minmax(220px, 1fr);
-      gap: 20px;
-      align-items: start;
-    }
-
-    .phone {
-      width: 390px;
-      height: 760px;
-      overflow: hidden;
-      border: 10px solid #11131b;
-      border-radius: 34px;
-      background: #f5f6f9;
-      color: var(--ink);
-      box-shadow: 0 28px 65px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(18, 199, 199, 0.16);
-      transform: translateZ(0);
-      animation: phoneFloat 6.5s ease-in-out infinite reverse;
-    }
-
-    #phoneRoot {
-      height: 100%;
-    }
-
-    .phone-shell {
-      height: 100%;
-      display: grid;
-      grid-template-rows: 34px 48px 1fr;
-      background: #f5f6f9;
-    }
-
-    .phone-status {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 18px;
-      background: #fff;
-      color: #121722;
-      font-size: 12px;
-      font-weight: 850;
-    }
-
-    .phone-top {
-      display: grid;
-      grid-template-columns: 42px 1fr 42px;
-      align-items: center;
-      background: #fff;
-      border-bottom: 1px solid #eef1f5;
-      text-align: center;
-      font-weight: 900;
-    }
-
-    .phone-page {
-      min-height: 0;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .scroll-page {
-      height: 100%;
-      overflow-y: auto;
-      padding: 12px 12px 86px;
-    }
-
-    .scroll-page::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    .scroll-page::-webkit-scrollbar-thumb {
-      background: #c4ccd8;
-      border-radius: 999px;
-    }
-
-    .linkish {
-      border: 0;
-      background: transparent;
-      color: #252b36;
-      cursor: pointer;
-      font-weight: 850;
-    }
-
-    .app-hero {
-      height: 180px;
-      background: #d7dade;
-    }
-
-    .app-hero img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: brightness(0.72);
-    }
-
-    .app-sheet {
-      height: calc(100% - 180px);
-      margin-top: -18px;
-      padding: 14px 12px 0;
-      border-radius: 22px 22px 0 0;
-      background: #fff;
-      position: relative;
-    }
-
-    .product-summary {
-      display: grid;
-      grid-template-columns: 74px 1fr auto;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .product-summary img {
-      width: 74px;
-      height: 74px;
-      object-fit: cover;
-      border: 1px solid #eef1f5;
-      border-radius: 8px;
-    }
-
-    .dewu-mark {
-      display: inline-grid;
-      place-items: center;
-      width: 24px;
-      height: 24px;
-      border-radius: 4px;
-      background: #05070b;
-      color: #fff;
-      font-size: 12px;
-      font-weight: 900;
-    }
-
-    .app-price {
-      font-size: 34px;
-      font-weight: 950;
-    }
-
-    .summary-meta {
-      margin-top: 4px;
-      color: #8a90a0;
-      font-size: 13px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .qty {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #111722;
-      font-weight: 800;
-    }
-
-    .qty span:first-child,
-    .qty span:last-child {
-      width: 26px;
-      height: 26px;
-      display: grid;
-      place-items: center;
-      border-radius: 6px;
-      background: #f0f2f6;
-      color: #8c92a0;
-    }
-
-    .app-section {
-      margin-top: 22px;
-    }
-
-    .section-line {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 12px;
-      color: #8a90a0;
-      font-size: 15px;
-      font-weight: 800;
-    }
-
-    .guide-link {
-      height: 30px;
-      padding: 0 10px;
-      border: 1px solid #d7dde6;
-      border-radius: 7px;
-      background: #fff;
-      color: #0f141e;
-      font-size: 13px;
-      font-weight: 850;
-      cursor: pointer;
-    }
-
-    .box-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .box {
-      min-width: 68px;
-      min-height: 44px;
-      padding: 0 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid #eff2f6;
-      border-radius: 7px;
-      background: #fff;
-      font-weight: 850;
-    }
-
-    .box.active {
-      border: 2px solid #11131b;
-    }
-
-    .trust-strip {
-      margin: 18px -12px 0;
-      padding: 10px 14px;
-      background: linear-gradient(90deg, #6d7a82, #a1abae);
-      color: #fff;
-      font-size: 12px;
-      font-weight: 800;
-      white-space: normal;
-      overflow: visible;
-      text-overflow: clip;
-      line-height: 1.42;
-    }
-
-    .option-bar {
-      position: absolute;
-      left: 12px;
-      right: 12px;
-      bottom: 12px;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    .buy-option {
-      position: relative;
-      min-height: 84px;
-      padding: 28px 10px 10px;
-      border: 0;
-      border-radius: 8px;
-      color: #fff;
-      cursor: pointer;
-      text-align: left;
-      overflow: hidden;
-    }
-
-    .buy-option.teal {
-      background: var(--teal);
-    }
-
-    .buy-option.dark {
-      background: var(--dark);
-    }
-
-    .buy-option.gray {
-      background: var(--gray);
-    }
-
-    .buy-tag {
-      position: absolute;
-      top: 7px;
-      right: 7px;
-      max-width: calc(100% - 14px);
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: rgba(0, 0, 0, 0.18);
-      font-size: 11px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .buy-option b {
-      display: block;
-      margin-bottom: 2px;
-      font-size: 24px;
-      line-height: 1.05;
-    }
-
-    .buy-option small {
-      font-size: 12px;
-      opacity: 0.9;
-    }
-
-    .notice {
-      display: grid;
-      grid-template-columns: 28px 1fr;
-      gap: 10px;
-      padding: 12px;
-      border-radius: 12px;
-      background: #edfafa;
-      color: #34404d;
-      font-size: 13px;
-      line-height: 1.55;
-    }
-
-    .notice-icon {
-      width: 28px;
-      height: 28px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      background: var(--teal);
-      color: #fff;
-      font-weight: 950;
-    }
-
-    .module {
-      margin-top: 12px;
-      padding: 12px;
-      border-radius: 14px;
-      background: #fff;
-      border: 1px solid #eef1f5;
-    }
-
-    .module-title {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 10px;
-      font-weight: 950;
-    }
-
-    .module-title span {
-      color: #9298a6;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .assurance-flow {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-
-    .flow-chip {
-      min-height: 54px;
-      padding: 8px;
-      border-radius: 10px;
-      background: #f6f8fb;
-      color: #495264;
-      font-size: 12px;
-      line-height: 1.35;
-      text-align: center;
-    }
-
-    .compare-list {
-      display: grid;
-      gap: 10px;
-    }
-
-    .compare-card {
-      width: 100%;
-      display: block;
-      padding: 12px;
-      border: 1px solid #e6ebf2;
-      border-radius: 12px;
-      background: #fff;
-      color: inherit;
-      text-align: left;
-      cursor: pointer;
-    }
-
-    .compare-card.selected {
-      border: 2px solid var(--blue);
-      background: #ecfbfb;
-      box-shadow: 0 8px 24px rgba(18, 199, 199, 0.14);
-    }
-
-    .compare-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 8px;
-    }
-
-    .compare-name {
-      font-size: 15px;
-      font-weight: 950;
-    }
-
-    .compare-meta {
-      margin-top: 4px;
-      color: #747b8b;
-      font-size: 12px;
-    }
-
-    .compare-price {
-      color: #111722;
-      font-size: 22px;
-      font-weight: 950;
-      white-space: nowrap;
-    }
-
-    .pill-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 8px;
-    }
-
-    .pill {
-      min-height: 24px;
-      padding: 0 8px;
-      border: 1px solid #dfe5ee;
-      border-radius: 999px;
-      background: #f8fafc;
-      color: #596173;
-      font-size: 11px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .pill.active {
-      border-color: #b8e9ea;
-      background: #ecfbfb;
-      color: #087f82;
-    }
-
-    .inline-explain {
-      margin: 8px 0;
-      padding: 9px;
-      border-radius: 10px;
-      background: #f5f8fb;
-      color: #4e5869;
-      font-size: 12px;
-      line-height: 1.55;
-    }
-
-    .fit {
-      color: #6b7280;
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    .confirm-option {
-      width: 100%;
-      height: 34px;
-      margin-top: 10px;
-      border: 0;
-      border-radius: 8px;
-      background: var(--teal);
-      color: #fff;
-      font-size: 13px;
-      font-weight: 900;
-      cursor: pointer;
-    }
-
-    .all-link {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-top: 10px;
-      padding: 10px;
-      border: 1px solid #e3e8ef;
-      border-radius: 10px;
-      background: #fafbfe;
-      color: #323946;
-      cursor: pointer;
-      text-align: left;
-      font-size: 12px;
-      font-weight: 850;
-    }
-
-    .all-link span:first-child {
-      white-space: nowrap;
-      flex: 0 0 auto;
-    }
-
-    .all-link span:last-child {
-      color: #8c93a2;
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .ai-choices {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .choice {
-      min-height: 30px;
-      padding: 0 10px;
-      border: 1px solid #dfe5ee;
-      border-radius: 999px;
-      background: #fff;
-      color: #444d5e;
-      font-size: 12px;
-      font-weight: 850;
-      cursor: pointer;
-    }
-
-    .choice.active {
-      border-color: var(--teal);
-      background: #e9fbfb;
-      color: #067b7e;
-    }
-
-    .ai-result {
-      margin-top: 10px;
-      padding: 12px;
-      border-radius: 12px;
-      background: #f6f8fb;
-    }
-
-    .ai-result h3 {
-      margin: 0 0 8px;
-      font-size: 14px;
-    }
-
-    .ai-result p {
-      margin: 6px 0 0;
-      color: #596173;
-      font-size: 12px;
-      line-height: 1.55;
-    }
-
-    .ai-result button {
-      margin-top: 10px;
-      width: 100%;
-      height: 34px;
-      border: 0;
-      border-radius: 8px;
-      background: var(--teal);
-      color: #fff;
-      font-weight: 900;
-      cursor: pointer;
-    }
-
-    .tabs {
-      position: sticky;
-      top: 0;
-      z-index: 3;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-      padding-bottom: 10px;
-      background: #f5f6f9;
-    }
-
-    .tab {
-      height: 32px;
-      border: 1px solid #dfe5ee;
-      border-radius: 8px;
-      background: #fff;
-      color: #596173;
-      font-size: 12px;
-      font-weight: 850;
-      cursor: pointer;
-    }
-
-    .tab.active {
-      border-color: var(--teal);
-      background: var(--teal);
-      color: #fff;
-    }
-
-    .term {
-      padding: 12px 0;
-      border-bottom: 1px solid #eef1f5;
-    }
-
-    .term:last-child {
-      border-bottom: 0;
-    }
-
-    .term h3 {
-      margin: 0 0 6px;
-      font-size: 14px;
-    }
-
-    .term p {
-      margin: 0;
-      color: #687080;
-      font-size: 12px;
-      line-height: 1.65;
-    }
-
-    .order-page {
-      height: 100%;
-      display: grid;
-      grid-template-rows: 1fr 94px;
-      background: #f5f6f9;
-    }
-
-    .order-scroll {
-      min-height: 0;
-      overflow-y: auto;
-      padding: 12px 12px 18px;
-    }
-
-    .order-block {
-      margin-bottom: 10px;
-      padding: 14px;
-      border-radius: 4px;
-      background: #fff;
-    }
-
-    .address-main {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 8px;
-      font-weight: 850;
-      line-height: 1.4;
-    }
-
-    .order-product {
-      display: grid;
-      grid-template-columns: 72px 1fr;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .order-product img {
-      width: 72px;
-      height: 72px;
-      object-fit: cover;
-      border: 1px solid #eef1f5;
-      border-radius: 6px;
-    }
-
-    .order-title {
-      font-size: 14px;
-      line-height: 1.45;
-      color: #343b48;
-    }
-
-    .order-sku {
-      margin-top: 8px;
-      color: #6f7685;
-      font-size: 13px;
-    }
-
-    .order-price {
-      margin-top: 8px;
-      font-size: 17px;
-      font-weight: 900;
-    }
-
-    .order-row {
-      display: grid;
-      grid-template-columns: 84px 1fr auto;
-      gap: 10px;
-      align-items: center;
-      padding: 12px 0;
-      border-top: 1px solid #eef1f5;
-      color: #3d4554;
-      font-size: 13px;
-    }
-
-    .order-row:first-child {
-      border-top: 0;
-    }
-
-    .order-row label {
-      color: #9299a7;
-    }
-
-    .check {
-      width: 22px;
-      height: 22px;
-      display: grid;
-      place-items: center;
-      border: 1px solid #d8dee8;
-      border-radius: 50%;
-      color: #fff;
-      font-size: 12px;
-    }
-
-    .check.active {
-      border-color: var(--teal);
-      background: var(--teal);
-    }
-
-    .pay-footer {
-      padding: 12px;
-      background: rgba(255, 255, 255, 0.96);
-      border-top: 1px solid #e9edf3;
-    }
-
-    .pay-total {
-      display: flex;
-      align-items: baseline;
-      justify-content: flex-end;
-      gap: 4px;
-      margin-bottom: 10px;
-      font-size: 14px;
-    }
-
-    .pay-total b {
-      color: #df2950;
-      font-size: 24px;
-    }
-
-    .pay-button {
-      width: 100%;
-      height: 46px;
-      border: 0;
-      border-radius: 4px;
-      background: #54c5c6;
-      color: #fff;
-      font-size: 18px;
-      font-weight: 900;
-    }
-
-    .demo-side {
-      display: grid;
-      gap: 12px;
-    }
-
-    .flow-card {
-      padding: 16px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: #fff;
-    }
-
-    #demo .flow-card {
-      border-color: rgba(18, 199, 199, 0.18);
-      background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(240, 253, 253, 0.86)),
-        repeating-linear-gradient(90deg, rgba(18, 199, 199, 0.035) 0 1px, transparent 1px 18px);
-      box-shadow: 0 14px 32px rgba(8, 22, 30, 0.07);
-    }
-
-    .flow-card h3 {
-      margin: 0 0 12px;
-      color: var(--ink);
-      font-size: 16px;
-      font-weight: 950;
-      line-height: 1.25;
-    }
-
-    .step {
-      display: grid;
-      grid-template-columns: 24px 1fr;
-      gap: 10px;
-      align-items: flex-start;
-      margin-top: 10px;
-      color: #606878;
-      font-size: 13px;
-      line-height: 1.55;
-    }
-
-    .step i {
-      width: 24px;
-      height: 24px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      background: #ebfbfb;
-      color: #087f82;
-      font-style: normal;
-      font-weight: 950;
-    }
-
-    #demo .step i {
-      background: var(--teal);
-      color: #061116;
-      box-shadow: 0 0 0 4px rgba(18, 199, 199, 0.12);
-    }
-
-    .feature-list {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .feature-card {
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #fff;
-    }
-
-    .feature-card strong {
-      display: block;
-      margin-bottom: 10px;
-      font-size: 17px;
-    }
-
-    .feature-card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.7;
-    }
-
-    .prd-browser {
-      display: grid;
-      grid-template-columns: 260px minmax(0, 1fr);
-      gap: 18px;
-      align-items: start;
-    }
-
-    .prd-browser + .asset-grid {
-      margin-top: 22px;
-    }
-
-    .prd-tabs {
-      display: grid;
-      gap: 10px;
-    }
-
-    .prd-tab {
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: #fff;
-      color: #333b49;
-      text-align: left;
-      cursor: pointer;
-      font-weight: 850;
-    }
-
-    .prd-tab.active {
-      border-color: var(--teal);
-      background: #ebfbfb;
-      color: #067b7e;
-    }
-
-    .prd-page {
-      min-height: 420px;
-      padding: 24px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: #fff;
-      box-shadow: var(--shadow);
-    }
-
-    .prd-page h3 {
-      margin: 0 0 14px;
-      font-size: 26px;
-    }
-
-    .prd-page p {
-      margin: 0 0 14px;
-      color: #4d5564;
-      line-height: 1.8;
-    }
-
-    .prd-page img {
-      width: 100%;
-      height: auto;
-      max-height: none;
-      object-fit: contain;
-      margin: 12px 0 18px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #f8fafc;
-    }
-
-    .prd-page ul {
-      margin: 0;
-      padding-left: 20px;
-      color: #4d5564;
-      line-height: 1.9;
-    }
-
-    .prd-actions {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: 20px;
-      padding-top: 16px;
-      border-top: 1px solid var(--line);
-    }
-
-    .asset-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 300px;
-      gap: 18px;
-      align-items: start;
-    }
-
-    .asset-panel {
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: #fff;
-    }
-
-    .asset-panel img {
-      width: 100%;
-      display: block;
-      border-radius: 10px;
-    }
-
-    .asset-links {
-      display: grid;
-      gap: 12px;
-    }
-
-    .asset-link {
-      display: block;
-      width: 100%;
-      text-align: left;
-      padding: 16px;
-      padding-right: 54px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #fff;
-      color: var(--ink);
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      transition: transform 180ms var(--motion), border-color 180ms var(--motion), box-shadow 180ms var(--motion), background 180ms var(--motion);
-    }
-
-    .asset-link::after {
-      content: "打开";
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      min-width: 34px;
-      height: 22px;
-      display: grid;
-      place-items: center;
-      border-radius: 999px;
-      background: rgba(18, 199, 199, 0.12);
-      color: var(--teal-dark);
-      font-size: 12px;
-      font-weight: 900;
-    }
-
-    .asset-link:hover,
-    .asset-link:focus-visible {
-      transform: translateY(-2px);
-      border-color: rgba(18, 199, 199, 0.55);
-      background: linear-gradient(180deg, #fff, #effefe);
-      box-shadow: 0 14px 34px rgba(10, 25, 34, 0.1);
-      outline: none;
-    }
-
-    .asset-link strong {
-      display: block;
-      margin-bottom: 8px;
-    }
-
-    .asset-link span {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    .footer {
-      padding: 28px 5vw 44px;
-      color: #747b8b;
-      text-align: center;
-      font-size: 13px;
-    }
-
-    @keyframes phoneFloat {
-      0%, 100% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(-8px);
-      }
-    }
-
-    @keyframes stageSweep {
-      0% {
-        transform: translateX(-120%);
-      }
-      100% {
-        transform: translateX(120%);
-      }
-    }
-
-    @keyframes tapPulse {
-      0% {
-        box-shadow: 0 0 0 0 rgba(18, 199, 199, 0.55);
-      }
-      72% {
-        box-shadow: 0 0 0 10px rgba(18, 199, 199, 0);
-      }
-      100% {
-        box-shadow: 0 0 0 0 rgba(18, 199, 199, 0);
-      }
-    }
-
-    .reveal-ready .hero > *,
-    .reveal-ready .section-head,
-    .reveal-ready .card,
-    .reveal-ready .metric-card,
-    .reveal-ready .demo-card,
-    .reveal-ready .prd-browser,
-    .reveal-ready .asset-panel,
-    .reveal-ready .asset-link {
-      opacity: 1;
-      transform: translateY(14px);
-      transition: opacity 640ms var(--motion), transform 640ms var(--motion);
-    }
-
-    .reveal-ready .is-visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        animation-duration: 0.001ms !important;
-        animation-iteration-count: 1 !important;
-        scroll-behavior: auto !important;
-        transition-duration: 0.001ms !important;
-      }
-    }
-
-    @media (max-width: 1180px) {
-      .hero,
-      .demo-wrap,
-      .demo-main,
-      .comparison-column,
-      .asset-grid,
-      .prd-browser {
-        grid-template-columns: 1fr;
-      }
-
-      .phone,
-      .old-phone {
-        margin: 0 auto;
-      }
-
-      #context,
-      #problem .card-grid,
-      #goals .card-grid,
-      #metrics .metric-grid,
-      .asset-grid {
-        grid-template-columns: 1fr;
-      }
-
-      #context .card,
-      #context .card:nth-child(2),
-      #context .card:nth-child(3) {
-        margin-left: 0;
-      }
-
-      #demo .demo-card:nth-child(2) {
-        transform: none;
-      }
-
-      .feature-list {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 760px) {
-      .topbar {
-        height: auto;
-        min-height: 64px;
-        align-items: flex-start;
-        gap: 12px;
-        padding: 14px 18px;
-        flex-direction: column;
-      }
-
-      .nav {
-        width: 100%;
-        overflow-x: auto;
-        padding-bottom: 2px;
-      }
-
-      .hero,
-      .section {
-        padding-left: 18px;
-        padding-right: 18px;
-      }
-
-      .hero {
-        min-height: auto;
-        padding-top: 36px;
-        padding-bottom: 36px;
-      }
-
-      .insight-grid,
-      .card-grid,
-      .metric-grid,
-      .feature-list {
-        grid-template-columns: 1fr;
-      }
-
-      .phone,
-      .old-phone {
-        width: 100%;
-        max-width: 390px;
-      }
-
-      .demo-card {
-        padding: 12px;
-      }
-    }
-  </style>
+  <meta name="theme-color" content="#070b0f" />
+  <title>得物 Buybox｜购买选项决策体验优化</title>
+  <meta name="description" content="围绕得物购买选项场景的个人产品设计项目：帮助用户看懂价格、渠道、成色、时效与售后差异，更快做出选择。" />
+  <meta property="og:title" content="得物 Buybox 购买选项决策体验优化" />
+  <meta property="og:description" content="看见多个购买选项，也知道该怎么选。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://SiyuQiannn.github.io/dewu-buybox/" />
+  <meta property="og:image" content="https://SiyuQiannn.github.io/dewu-buybox/demo/assets/01-entry.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="https://SiyuQiannn.github.io/dewu-buybox/" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <canvas id="ambientCanvas" aria-hidden="true"></canvas>
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <div class="scroll-progress" aria-hidden="true"><span></span></div>
+
   <header class="topbar">
-    <a class="brand" href="#top" aria-label="回到顶部">
-      <span class="brand-mark">得物</span>
-      <span>Buybox 购买选项决策体验优化</span>
+    <a class="brand magnetic" href="#top" aria-label="返回顶部">
+      <span class="brand-glyph">得物</span>
+      <span class="brand-copy"><b>BUYBOX</b><small>PRODUCT CASE</small></span>
     </a>
-    <nav class="nav" aria-label="页面导航">
-      <a href="#overview">项目概述</a>
-      <a href="#demo">方案交互 Demo</a>
-      <a href="#context">业务背景与产品现状</a>
-      <a href="#problem">核心问题定义</a>
-      <a href="#goals">项目目标与方案边界</a>
-      <a href="#metrics">数据指标与风险应对</a>
-      <a href="#prd">PRD 与原型资料</a>
+    <nav aria-label="页面导航">
+      <a href="#story">产品故事</a>
+      <a href="#lab">交互原型</a>
+      <a href="#helper">帮我选</a>
+      <a href="#evidence">产品判断</a>
+      <a href="#prd">完整 PRD</a>
     </nav>
+    <a class="nav-cta magnetic" href="#lab">体验原型 <span>↘</span></a>
   </header>
 
   <main id="top">
-    <section class="hero" id="overview">
-      <div>
-        <span class="eyebrow">项目概述 · 电商交易产品项目</span>
-        <h1>把复杂购买选项，转译成用户能放心下单的选择。</h1>
-        <p class="lead">本项目围绕得物“尺码 + 购买选项页”，设计「选项怎么选」能力。在不暴露具体供应商身份、不破坏平台统一正品心智的前提下，帮助用户理解不同购买选项的渠道、成色、时效、查验和售后差异，降低正品焦虑与售后预期偏差，提升下单决策效率。</p>
-        <div class="hero-actions">
-          <a class="btn compact" href="#overview">项目概述</a>
-          <a class="btn primary compact" href="#demo">方案交互 Demo</a>
-          <a class="btn compact" href="#context">业务背景与产品现状</a>
-          <a class="btn compact" href="#problem">核心问题定义</a>
-          <a class="btn compact" href="#goals">项目目标与方案边界</a>
-          <a class="btn compact" href="#metrics">数据指标与风险应对</a>
-          <a class="btn compact" href="#prd">PRD 与原型资料</a>
+    <section class="hero">
+      <div class="hero-grid" aria-hidden="true"></div>
+      <div class="hero-orbit orbit-one" aria-hidden="true"></div>
+      <div class="hero-orbit orbit-two" aria-hidden="true"></div>
+
+      <div class="hero-copy">
+        <div class="overline reveal"><span class="signal-dot"></span>PERSONAL PRODUCT CASE · 2026</div>
+        <h1 class="kinetic-title">
+          <span class="title-line">看见多个选项，</span>
+          <span class="title-line accent">也知道</span>
+          <span class="title-line">该怎么选。</span>
+        </h1>
+        <p class="hero-lede reveal">
+          同一个商品为什么会有不同价格、不同到货时间？我围绕得物“尺码 + 购买选项”页面，
+          设计了「选项怎么选」辅助入口，把渠道、成色、时效和售后差异讲清楚。
+        </p>
+        <div class="hero-actions reveal">
+          <a class="primary-action magnetic" href="#story">查看产品故事 <span>↓</span></a>
+          <a class="secondary-action magnetic" href="#lab">直接体验原型 <span>↗</span></a>
+        </div>
+        <div class="hero-meta reveal">
+          <div><b>ROLE</b><span>产品策划 / 交互设计</span></div>
+          <div><b>SCOPE</b><span>购买选项决策体验</span></div>
+          <div><b>OUTPUT</b><span>PRD / 可点击原型 / 指标方案</span></div>
         </div>
       </div>
 
-      <aside class="hero-card">
-        <h2>项目要解决什么</h2>
-        <div class="logic-list">
-          <div class="logic-item">
-            <strong>用户疑问</strong>
-            <span>为什么同一个商品有多个价格和标签？1-3 天到是否真的经过查验？不同选项的售后差异在哪里？</span>
-          </div>
-          <div class="logic-item">
-            <strong>平台约束</strong>
-            <span>不能把供应商身份完全前台化，仍要维持“得物统一正品保障”的心智。</span>
-          </div>
-          <div class="logic-item">
-            <strong>设计方向</strong>
-            <span>不改底部“立即购买”主链路，只在尺码和购买选项页增加「选项怎么选」入口。</span>
-          </div>
+      <div class="hero-stage" aria-label="原版入口页原型">
+        <div class="stage-halo" aria-hidden="true"></div>
+        <div class="phone phone-hero phone-exact tilt" data-tilt>
+          <img class="exact-screen" src="assets/01-entry.png" alt="购买选项页入口原型" />
         </div>
-      </aside>
+        <div class="float-card option-a parallax" data-depth="0.14">
+          <span>更快到货</span><b>¥476</b><small>品牌官方 · 约 2 天到</small>
+        </div>
+        <div class="float-card option-b parallax" data-depth="0.22">
+          <span>价格更低</span><b>¥471</b><small>品牌专供 · 约 5–6 天到</small>
+        </div>
+        <div class="float-card option-c parallax" data-depth="0.18">
+          <span>成色性价比</span><b>¥395</b><small>95 分 · 约 1–3 天到</small>
+        </div>
+        <div class="trust-orb parallax" data-depth="0.28"><b>查验</b><span>平台保障</span></div>
+      </div>
+
+      <div class="scroll-cue" aria-hidden="true"><span></span><b>向下查看项目</b></div>
     </section>
 
-    <section class="section" id="context">
-      <div class="section-head">
-        <div class="section-kicker">业务背景与产品现状</div>
-        <h2>得物多购买选项机制聚合了供给，也放大了前台信息理解成本。</h2>
-        <p>得物长期以“多报价 + 先鉴别后发货”为核心交易特色。同一商品下可能出现品牌官方、品牌专供、全球购、保税直发、95 分等购买选项。消费者前台主要看到渠道标签、成色标签、价格与预计到货时间，具体发货模式通常隐藏在履约时效中。</p>
-      </div>
-      <div class="insight-grid">
-        <article class="card">
-          <h3>前台可见信息</h3>
-          <p>前台能看到渠道/成色标签、价格、选项颜色与物流时效；普通渠道、履约模式、不支持项通常不显性展示。</p>
-        </article>
-        <article class="card">
-          <h3>后台履约被封装</h3>
-          <p>后台履约词如品牌入仓、品牌现货、品牌直发、闪电直发，不直接前台化，而转译为查验链路与时效原因。</p>
-        </article>
-        <article class="card">
-          <h3>统一心智与差异决策</h3>
-          <p>平台维持“得物统一正品保障”的信任底座，同时解释不同选项在渠道、成色、时效和售后上的差异。</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="section white" id="problem">
-      <div class="section-head">
-        <div class="section-kicker">核心问题定义</div>
-        <h2>核心问题不是“购买选项太多”，而是统一正品心智与差异化决策之间存在信息断层。</h2>
-        <p>用户能看到价格、标签和物流时效，却难以理解这些差异背后的原因，容易将渠道、成色、履约时效、售后规则差异误读为正品保障差异。</p>
-      </div>
-      <div class="insight-grid">
-        <article class="card">
-          <h3>标签缺少官方解释</h3>
-          <p>品牌官方、品牌专供、全球购、保税直发、95 分等标签缺少下单场景内的即时说明。</p>
-        </article>
-        <article class="card">
-          <h3>时效差异引发查验焦虑</h3>
-          <p>1-3 天到容易被误读为“没有时间鉴定”，需要解释提前入仓、仓配节点或先查验后发出的逻辑。</p>
-        </article>
-        <article class="card">
-          <h3>横向对比能力不足</h3>
-          <p>用户很难同时比较价格、时效、渠道、成色和售后权益，需要反复记忆、截图或到外部平台搜索。</p>
-        </article>
+    <section class="marquee" aria-label="项目关键词">
+      <div class="marquee-track">
+        <span>BUYBOX</span><i>+</i><span>购买选项</span><i>+</i><span>价格</span><i>+</i>
+        <span>时效</span><i>+</i><span>渠道</span><i>+</i><span>售后</span><i>+</i><span>决策</span><i>+</i>
+        <span>BUYBOX</span><i>+</i><span>购买选项</span><i>+</i><span>价格</span><i>+</i>
+        <span>时效</span><i>+</i><span>渠道</span><i>+</i><span>售后</span><i>+</i><span>决策</span><i>+</i>
       </div>
     </section>
 
-    <section class="section" id="goals">
-      <div class="section-head">
-        <div class="section-kicker">项目目标与方案边界</div>
-        <h2>在不改变交易主流程的前提下，补齐购买决策所需的信息透明度。</h2>
+    <section class="story" id="story">
+      <div class="story-visual">
+        <div class="chapter-index"><span>01</span><small>产品故事</small></div>
+        <div class="story-device-wrap">
+          <div class="story-rings" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="phone phone-story phone-exact">
+            <img class="exact-screen story-prototype" id="storyPrototype" src="assets/01-entry.png" alt="产品故事对应的原型页面" />
+          </div>
+          <div class="scene-caption" id="sceneCaption"><b>01</b><span>选项很多，但用户不知道差异到底在哪里。</span></div>
+        </div>
       </div>
-      <div class="card-grid">
-        <article class="card">
-          <h3>用户目标</h3>
-          <p>帮助用户快速判断所有选项是否经过平台查验、快到货原因、标签含义、售后差异，以及不同偏好下的选择取舍。</p>
+
+      <div class="story-steps">
+        <article class="story-step is-active" data-scene="0">
+          <span>01 / 问题从哪里开始</span>
+          <h2>用户看见多个购买选项，却不知道<span>差在哪。</span></h2>
+          <p>同一个商品可能同时出现品牌官方、品牌专供、保税直发、全球购和 95 分等选项。页面展示了价格与部分标签，却没有把渠道、成色、时效和售后差异放在一起说明。</p>
+          <div class="quote">用户真正想知道的是：“多花的钱买到了什么？便宜的选项又少了什么？”</div>
         </article>
-        <article class="card">
-          <h3>平台目标</h3>
-          <p>强化统一品质保障，减少标签和时效误解，降低售后预期偏差，缩短购买选项页决策时长。</p>
+
+        <article class="story-step" data-scene="1">
+          <span>02 / 真正缺少的内容</span>
+          <h2>不是再加几个标签，而是把差异<span>说清楚。</span></h2>
+          <p>到货更快不代表没有查验，价格更低也不等于保障更差。用户需要在下单前看到渠道、成色、查验和售后差异，而不是自己猜。</p>
+          <ul><li>先说明各选项共有的平台保障</li><li>再对比价格、时效、渠道和成色</li><li>售后规则放在需要时可查看的位置</li></ul>
         </article>
-        <article class="card">
-          <h3>方案边界</h3>
-          <p>不改变商品详情页底部购买栏，不暴露具体供应商身份，不调整 Buybox 排序，不把普通渠道或不支持项做成醒目前台标签。</p>
+
+        <article class="story-step" data-scene="2">
+          <span>03 / 解释怎么放</span>
+          <h2>不把规则塞回购买页，而是让用户<span>按需查看。</span></h2>
+          <p>渠道、成色、查验时效和售后规则集中放进说明页。用户可以从对比页继续查看，也可以随时返回原来的选择过程。</p>
+          <div class="principle-row"><b>主路径不变</b><b>解释按需展开</b><b>当前选项优先</b></div>
+        </article>
+
+        <article class="story-step" data-scene="3">
+          <span>04 / 最终方案</span>
+          <h2>对比、解释和推荐，都放进<span>同一个页面。</span></h2>
+          <p>先说明共同保障，再比较当前所有购买选项；用户可以点开标签看说明，也可以选择自己最关心的条件，让页面帮忙推荐。</p>
+          <a class="inline-link magnetic" href="#lab">体验完整原型 <span>↘</span></a>
         </article>
       </div>
     </section>
 
-    <section class="section white" id="demo">
-      <div class="section-head">
-        <div class="section-kicker">方案交互 Demo</div>
-        <h2>左侧是旧版问题，右侧是新版购买链路。</h2>
-        <p>新版链路保持“立即购买 → 尺码与购买选项 → 确认订单”的主路径，只新增「选项怎么选」作为辅助决策入口。购买选项仍可直接下单，辅助页内采用“先选中查看完整信息，再确认该选项”的两步交互。</p>
+    <section class="feature-reel">
+      <div class="reel-head reveal">
+        <span class="section-marker"><b>02</b><em>方案结构</em></span>
+        <h2>把复杂信息收进<br />同一个辅助入口。</h2>
       </div>
-      <div class="interactive-ribbon"><span class="pulse-dot"></span><strong>右侧手机可交互</strong><span>点击「选项怎么选」、底部购买选项、对比卡片、标签 chip 和 AI 偏好，可模拟完整跳转链路。</span></div>
+      <div class="reel-track">
+        <article class="feature-panel panel-trust tilt" data-tilt>
+          <small>01 / 共同保障</small><h3>先回答“是不是都靠谱”</h3>
+          <p>先说明当前可选方案都经过得物查验，并享有平台品质保障，避免用户把价格差异误解成真假差异。</p>
+          <div class="feature-glyph shield-glyph">保</div>
+        </article>
+        <article class="feature-panel panel-compare tilt" data-tilt>
+          <small>02 / 当前对比</small><h3>五种选项，一次看懂</h3>
+          <p>把价格、预计到货、渠道、成色和售后权益放到同一视线里，减少来回切换和记忆。</p>
+          <div class="compare-bars"><i></i><i></i><i></i></div>
+        </article>
+        <article class="feature-panel panel-chip tilt" data-tilt>
+          <small>03 / 标签解释</small><h3>点到哪里，就解释到哪里</h3>
+          <p>品牌官方、得物查验、95 分等标签都可以直接点开，页面不需要堆成长篇说明。</p>
+          <div class="chip-cloud"><i>得物查验</i><i>退货包运费</i><i>95 分</i></div>
+        </article>
+        <article class="feature-panel panel-ai tilt" data-tilt>
+          <small>04 / 帮我选</small><h3>按关注点给出建议</h3>
+          <p>用户选择“最快收到”“预算最低”或“跨境但不想久等”等条件，页面给出更合适的选项和相应取舍。</p>
+          <div class="focus-switch"><span>最快收到</span><span>预算最低</span><span>跨境但不想久等</span></div>
+        </article>
+      </div>
+    </section>
 
-      <div class="demo-wrap">
-        <div class="demo-card">
-          <div class="demo-title">旧版决策体验 <span>信息可见，但解释缺位</span></div>
-          <div class="comparison-column">
-            <div class="old-phone" aria-label="旧版购买选项示意">
-              <div class="old-hero">
-                <img src="assets/bracelet.jpg" alt="商品图" />
-              </div>
-              <div class="old-sheet">
-                <div class="old-product">
-                  <img src="assets/bracelet.jpg" alt="商品缩略图" />
-                  <div>
-                    <div class="old-price-line"><span class="dewu-mark">得物</span><span class="old-price">¥471</span></div>
-                    <div class="muted">已选 金色 F 默认包装</div>
-                  </div>
-                  <div class="qty"><span>−</span><b>1</b><span>＋</span></div>
-                </div>
-                <div class="old-block-title">款式</div>
-                <div class="old-box-row">
-                  <div class="old-box active">金色</div>
-                  <div class="old-box">玫瑰金色</div>
-                </div>
-                <div class="old-block-title">尺码</div>
-                <div class="old-box-row">
-                  <div class="old-box active">F</div>
-                </div>
-                <div class="old-block-title">购买选项</div>
-                <div class="old-options">
-                  <div class="old-option teal"><span class="old-tag">品牌官方</span><b>¥476</b><span>约2天到</span></div>
-                  <div class="old-option dark"><span class="old-tag">品牌专供</span><b>¥471</b><span>约5-6天到</span></div>
-                  <div class="old-option gray"><span class="old-tag">95 仅鞋盒瑕疵</span><b>¥395</b><span>约1-3天到</span></div>
-                </div>
-              </div>
+    <section class="lab" id="lab">
+      <div class="lab-head reveal">
+        <div><span class="section-marker is-dark"><b>03</b><em>高保真交互原型</em></span><h2>从购买选项，<br />走到确认订单。</h2></div>
+        <p>点击手机中的入口、选项、标签和关注点，完整体验「选项怎么选」如何接入原有购买流程。</p>
+      </div>
+
+      <div class="lab-live-banner reveal">
+        <div class="live-signal"><i></i><span>LIVE DEMO</span></div>
+        <div><strong>下面的手机可以直接点击和滑动</strong><p>试着打开「选项怎么选」、切换五种购买选项、查看标签说明，再进入确认订单页。</p></div>
+        <a href="#interactiveDemo">开始体验 <span>↓</span></a>
+      </div>
+
+      <div class="lab-layout original-demo-grid">
+        <article class="original-demo-card">
+          <header class="original-demo-title">
+            <div><span>BEFORE</span><h3>原购买体验</h3></div>
+            <small>信息可见，但解释缺位</small>
+          </header>
+          <div class="original-demo-body">
+            <div class="prototype-device original-prototype-device baseline-device" id="baselinePrototype" data-state="market">
+              <div id="baselinePhoneRoot" aria-live="polite"></div>
             </div>
-            <aside class="demo-side">
-              <div class="flow-card">
-                <h3>旧版痛点</h3>
-                <div class="step"><i>1</i><span>标签存在，但缺少下单场景内的官方解释。</span></div>
-                <div class="step"><i>2</i><span>物流时效承载了履约信息，却没有解释快到货与查验的关系。</span></div>
-                <div class="step"><i>3</i><span>售后权益披露靠后，用户需要进入更深链路继续确认。</span></div>
-                <div class="step"><i>4</i><span>多个选项缺少横向对比工具，用户只能自行比较价格、时效与规则。</span></div>
+            <aside class="original-demo-notes">
+              <h4>用户需要自己完成判断</h4>
+              <p><i>01</i>标签存在，但缺少下单场景内的解释。</p>
+              <p><i>02</i>快到货容易被误解为没有经过查验。</p>
+              <p><i>03</i>售后权益需要进入更深链路继续确认。</p>
+              <p><i>04</i>多个选项之间缺少横向比较。</p>
+            </aside>
+          </div>
+        </article>
+
+        <article class="original-demo-card is-after" id="interactiveDemo">
+          <header class="original-demo-title">
+            <div><span>AFTER · 可交互</span><h3>优化后购买链路</h3></div>
+            <button class="ghost-button magnetic" id="resetDemo" type="button">重置原型 ↺</button>
+          </header>
+          <div class="original-demo-body">
+            <div class="prototype-device original-prototype-device" id="prototypeDemo" data-state="entry">
+              <div id="phoneRoot" aria-live="polite"></div>
+              <div class="demo-touch-cue" aria-hidden="true"><i>↙</i><span>点击手机内的按钮</span></div>
+            </div>
+            <aside class="original-demo-notes">
+              <div class="inspector-top"><span>当前页面</span><b id="stateLabel">入口页</b></div>
+              <h4 id="taskLabel">让需要帮助的用户找到辅助入口</h4>
+              <p><i>01</i>点击底部购买选项，可直接进入确认订单。</p>
+              <p><i>02</i>点击「选项怎么选」，进入可滚动的辅助页。</p>
+              <p><i>03</i>选项、标签和关注点都可以继续点击。</p>
+              <p><i>04</i>确认选择后回到原有下单链路。</p>
+              <small id="principleLabel">不改变原来的购买主路径</small>
+              <span class="sr-only" id="tapHint">点击「选项怎么选」</span>
+              <div class="sr-only" id="eventStream" aria-live="polite"></div>
+              <div hidden>
+                <div class="lab-step is-active" data-lab-step="entry"></div>
+                <div class="lab-step" data-lab-step="compare"></div>
+                <div class="lab-step" data-lab-step="recommend"></div>
+                <div class="lab-step" data-lab-step="explain"></div>
               </div>
             </aside>
           </div>
-        </div>
-
-        <div class="demo-card">
-          <div class="demo-title">
-            <span style="font-size:16px;color:#10131c">新版交互 Demo</span>
-            <button class="btn" type="button" id="resetDemo">重置 Demo</button>
-          </div>
-          <div class="demo-main">
-            <div class="interactive-phone-wrap">
-              <div class="phone-hint">点击手机内按钮试试</div>
-              <div class="phone" aria-live="polite">
-                <div id="phoneRoot"></div>
-              </div>
-            </div>
-            <aside class="demo-side">
-              <div class="flow-card">
-                <h3>正确跳转逻辑</h3>
-                <div class="step"><i>1</i><span>点击购买选项：进入确认订单页。</span></div>
-                <div class="step"><i>2</i><span>点击「选项怎么选」：进入辅助决策页。</span></div>
-                <div class="step"><i>3</i><span>辅助决策页可向下滚动，当前选项对比下方还有 AI 帮我选。</span></div>
-                <div class="step"><i>4</i><span>辅助决策页中先选中购买选项查看完整信息，再点击确认按钮进入确认订单页。</span></div>
-              </div>
-              <div class="flow-card">
-                <h3>这一版保留的产品边界</h3>
-                <div class="step"><i>A</i><span>不改商品详情页底部购买栏，仍使用立即购买作为主入口。</span></div>
-                <div class="step"><i>B</i><span>购买选项页只新增一个「选项怎么选」入口，避免页面变重。</span></div>
-                <div class="step"><i>C</i><span>解释围绕平台品质保障、查验链路、权益差异展开，不暴露具体供应商身份。</span></div>
-              </div>
-            </aside>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="metrics">
-      <div class="section-head">
-        <div class="section-kicker">数据指标与风险应对</div>
-        <h2>围绕交易效率、解释需求和售后预期建立验证体系。</h2>
-      </div>
-      <div class="metric-grid">
-        <article class="metric-card">
-          <h3>转化效率</h3>
-          <p>购买选项页到确认订单页转化率、平均决策时长、进入辅助页后的继续下单率。</p>
-        </article>
-        <article class="metric-card">
-          <h3>解释需求</h3>
-          <p>「选项怎么选」点击率、标签解释点击率、全部说明页访问率、AI 偏好点击率。</p>
-        </article>
-        <article class="metric-card">
-          <h3>售后预期</h3>
-          <p>查验、到货时效、售后权益相关客服咨询量变化，以及相关退款退货争议变化。</p>
-        </article>
-        <article class="metric-card">
-          <h3>信息过载风险</h3>
-          <p>购买选项页只保留一个轻入口，详细说明沉入「选项怎么选」和 chip 解释，避免主链路变重。</p>
-        </article>
-        <article class="metric-card">
-          <h3>转化影响风险</h3>
-          <p>不把普通渠道、不支持七天无理由等负面信息做成醒目前台标签，以支持项和规则说明为主。</p>
-        </article>
-        <article class="metric-card">
-          <h3>AI 可信度风险</h3>
-          <p>AI 只解释偏好匹配和取舍，不承诺绝对最优，最终权益和价格以当前页面与订单页为准。</p>
         </article>
       </div>
     </section>
 
-    <section class="section white" id="prd">
-      <div class="section-head">
-        <div class="section-kicker">PRD 与原型资料</div>
-        <h2>完整方案逻辑与终版原型。</h2>
-        <p>PRD 按项目概述、业务背景、核心问题、项目目标、信息架构、用户链路、功能方案、优先级、数据指标、风险应对和原型说明展开。功能页面细节可在上方交互 Demo 中直接体验。</p>
+    <section class="helper" id="helper">
+      <div class="helper-head reveal">
+        <span class="section-marker"><b>04</b><em>帮我选</em></span>
+        <h2>先点一个在意点，再看更适合你的<span>方案。</span></h2>
+        <p>七个关注点都可以点击。每次选择后，右侧都会同步更新推荐方案、推荐理由和需要接受的取舍。</p>
       </div>
-      <div class="prd-browser">
-        <div class="prd-tabs" id="prdTabs"></div>
-        <article class="prd-page" id="prdPage"></article>
-      </div>
-      <div class="asset-grid">
-        <div class="asset-panel">
-          <img src="assets/prototype-overview.png" alt="得物 Buybox 购买选项决策体验优化终版原型总览" />
+
+      <div class="preference-cinema reveal">
+        <div class="preference-selector">
+          <div class="preference-guide">
+            <span><b>STEP 01</b><i></i></span>
+            <strong>点击选择你最在意的条件</strong>
+            <small>↓ 试着切换不同关注点</small>
+          </div>
+          <div class="preference-controls" aria-label="选择最关注的购买条件">
+            <button class="pref-fast is-active" type="button" data-preference="fast"><i>01</i><span>最快收到</span></button>
+            <button class="pref-cheap" type="button" data-preference="cheap"><i>02</i><span>预算最低</span></button>
+            <button class="pref-after" type="button" data-preference="afterSale"><i>03</i><span>售后更灵活</span></button>
+            <button class="pref-brand" type="button" data-preference="brand"><i>04</i><span>品牌渠道</span></button>
+            <button class="pref-bonded" type="button" data-preference="bonded"><i>05</i><span>跨境不久等</span></button>
+            <button class="pref-global" type="button" data-preference="global"><i>06</i><span>全新更划算</span></button>
+            <button class="pref-value" type="button" data-preference="value"><i>07</i><span>成色性价比</span></button>
+          </div>
         </div>
-        <div class="asset-links">
-          <button class="asset-link" type="button" data-open-file="./assets/prototype-overview.png">
-            <strong>打开终版原型总览图</strong>
-            <span>包含购买选项入口态、选项怎么选、AI 推荐态和全部标签说明页。</span>
-          </button>
-          <button class="asset-link" type="button" data-open-file="./prd.md">
-            <strong>打开 Markdown 备份</strong>
-            <span>保留完整文档源文件，便于进一步编辑和迁移到飞书文档。</span>
-          </button>
+
+        <div class="recommend-copy">
+          <div class="recommend-live"><i></i><span>RECOMMENDATION UPDATED LIVE</span></div>
+          <div class="recommend-for"><small>当前关注</small><strong id="helperFocusLabel">最快收到</strong></div>
+          <div class="recommend-result"><small>推荐方案</small><strong id="helperOption">品牌官方</strong><b id="helperPrice">¥476</b></div>
+          <h3 id="helperTitle">想尽快收到，可以优先看品牌官方。</h3>
+          <p id="helperReason">这是当前预计到货最快的选项，也保留品牌渠道和页面展示的售后权益。</p>
+          <div class="helper-tradeoff"><b>需要留意</b><span id="helperTradeoff">价格高于其他全新选项，最终到货时间以订单页为准。</span></div>
+          <button type="button" id="showRecommendPrototype">在原型中查看 ↗</button>
         </div>
       </div>
+
+      <div class="option-ticker reveal" aria-label="当前五种购买选项">
+        <div class="option-ticker-track">
+          <span class="is-selected" data-helper-choice="official"><i>品牌官方</i><b>¥476</b><small>约 2 天到</small></span>
+          <span data-helper-choice="special"><i>品牌专供</i><b>¥471</b><small>约 5–6 天到</small></span>
+          <span data-helper-choice="bonded"><i>保税直发</i><b>¥458</b><small>约 4–7 天到</small></span>
+          <span data-helper-choice="global"><i>全球购</i><b>¥439</b><small>约 8–12 天到</small></span>
+          <span data-helper-choice="used"><i>95 分</i><b>¥395</b><small>约 1–3 天到</small></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="evidence" id="evidence">
+      <div class="evidence-head reveal">
+        <span class="section-marker"><b>05</b><em>产品判断</em></span>
+        <h2>先确认共同保障，再比较选项<span>差异。</span></h2>
+        <p>价格、到货时间和售后权益确实不同，但用户更需要先确认：无论选择哪一种，都经过得物查验，并享有平台品质保障。确认这个共同前提后，用户才能更放心地比较具体差异。</p>
+      </div>
+
+      <div class="assurance-universe reveal">
+        <div class="universe-copy">
+          <small>共同保障是所有比较的前提</small>
+          <h3>选项不同，<br />不等于保障不同。</h3>
+          <p>先回答“是不是都可靠”，再回答“哪一个更适合我”。这是整套方案最重要的产品判断。</p>
+        </div>
+        <div class="assurance-orbit">
+          <div class="assurance-rings" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="assurance-core"><small>所有选项共同拥有</small><strong>得物查验</strong><i>+</i><strong>平台品质保障</strong></div>
+          <span class="assurance-satellite sat-official">品牌官方</span>
+          <span class="assurance-satellite sat-special">品牌专供</span>
+          <span class="assurance-satellite sat-bonded">保税直发</span>
+          <span class="assurance-satellite sat-global">全球购</span>
+          <span class="assurance-satellite sat-used">95 分</span>
+        </div>
+      </div>
+
+      <div class="difference-spectrum reveal">
+        <div class="spectrum-heading"><small>共同保障确认之后，再比较四类具体差异</small><span>DIFFERENCE SPECTRUM</span></div>
+        <div class="spectrum-row"><b>价格</b><div><i style="--start:6%;--end:88%"></i><span style="--pos:18%">¥395</span><span style="--pos:82%">¥476</span></div><p>渠道、成色与履约组合</p></div>
+        <div class="spectrum-row"><b>到货时间</b><div><i style="--start:12%;--end:92%"></i><span style="--pos:16%">1–3 天</span><span style="--pos:82%">8–12 天</span></div><p>库存位置与履约方式</p></div>
+        <div class="spectrum-row"><b>渠道与成色</b><div><i style="--start:4%;--end:94%"></i><span style="--pos:10%">95 分</span><span style="--pos:74%">品牌 / 跨境</span></div><p>商品来源与状态说明</p></div>
+        <div class="spectrum-row"><b>售后权益</b><div><i style="--start:18%;--end:84%"></i><span style="--pos:20%">标准售后</span><span style="--pos:70%">跨境 / 二手规则</span></div><p>退换条件与处理时间</p></div>
+      </div>
+
+      <div class="judgment-sequence reveal">
+        <div class="sequence-heading"><small>PRODUCT LOGIC</small><strong>产品判断的顺序不能倒过来</strong></div>
+        <div class="sequence-flow">
+          <article><b>01</b><span>确认</span><strong>共同保障</strong><p>先消除对真假与品质保障的担心。</p></article>
+          <i aria-hidden="true">→</i>
+          <article><b>02</b><span>比较</span><strong>具体差异</strong><p>再看价格、时效、渠道与售后。</p></article>
+          <i aria-hidden="true">→</i>
+          <article><b>03</b><span>建议</span><strong>说明取舍</strong><p>最后帮助选择，但不替用户决定。</p></article>
+        </div>
+        <p class="sequence-conclusion">共同保障是比较的前提，具体差异才是选择的依据。</p>
+      </div>
+    </section>
+
+    <section class="metrics">
+      <div class="metrics-head reveal">
+        <span class="section-marker is-dark"><b>06</b><em>验证思路</em></span>
+        <h2>如果功能上线，就看<br />用户是否更容易<span>做出选择。</span></h2>
+        <p>验证重点不是有多少人点过“帮我选”，而是理解成本是否下降、选择是否更顺利，以及后续误解是否减少。</p>
+      </div>
+
+      <div class="measurement-field reveal">
+        <div class="measurement-beam" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="north-star-route">
+          <small>NORTH STAR / 核心结果指标</small>
+          <strong><span>选择页</span><i>→</i><span>确认订单页</span></strong>
+          <b>转化率</b>
+        </div>
+        <div class="metric-node node-choice"><b>01</b><small>选择是否更顺利</small><strong>辅助页继续下单率</strong><p>完成对比后，是否继续进入确认订单。</p></div>
+        <div class="metric-node node-efficiency"><b>02</b><small>决定是否更快</small><strong>平均决策时长</strong><p>同时观察反复切换选项的次数。</p></div>
+        <div class="metric-node node-understanding"><b>03</b><small>差异是否被看懂</small><strong>说明访问率</strong><p>判断哪些概念最需要平台解释。</p></div>
+        <div class="metric-node node-expectation"><b>04</b><small>后续误解是否减少</small><strong>相关咨询与退款原因</strong><p>关注查验、时效和售后问题的变化。</p></div>
+      </div>
+
+      <div class="experiment-marquee reveal">
+        <div>
+          <span><b>A/B 对照</b>原购买页 VS 增加辅助功能后的页面</span><i>+</i>
+          <span><b>保护指标</b>直接下单率 / 页面退出率 / 退款率</span><i>+</i>
+          <span><b>综合判断</b>结果指标 / 效率指标 / 后续反馈</span><i>+</i>
+          <span><b>A/B 对照</b>原购买页 VS 增加辅助功能后的页面</span><i>+</i>
+          <span><b>保护指标</b>直接下单率 / 页面退出率 / 退款率</span><i>+</i>
+          <span><b>综合判断</b>结果指标 / 效率指标 / 后续反馈</span><i>+</i>
+        </div>
+      </div>
+      <p class="metric-note reveal">以上为功能上线后的验证方案，本项目暂无线上业务数据。</p>
+    </section>
+
+    <section class="prd-section" id="prd">
+      <div class="prd-head reveal">
+        <span class="section-marker"><b>07</b><em>完整 PRD</em></span>
+        <h2>从问题定义到功能方案。</h2>
+        <p>本板块完整呈现项目背景、核心问题、用户链路、功能设计、指标方案与风险判断。</p>
+      </div>
+
+      <div class="prd-workspace reveal">
+        <aside class="prd-nav" id="prdNav" aria-label="PRD 章节">
+          <button class="is-active" type="button" data-prd-index="0"><b>01</b><span>项目概述</span></button>
+          <button type="button" data-prd-index="1"><b>02</b><span>业务背景</span></button>
+          <button type="button" data-prd-index="2"><b>03</b><span>核心问题</span></button>
+          <button type="button" data-prd-index="3"><b>04</b><span>项目目标</span></button>
+          <button type="button" data-prd-index="4"><b>05</b><span>信息架构</span></button>
+          <button type="button" data-prd-index="5"><b>06</b><span>用户链路</span></button>
+          <button type="button" data-prd-index="6"><b>07</b><span>功能方案</span></button>
+          <button type="button" data-prd-index="7"><b>08</b><span>优先级</span></button>
+          <button type="button" data-prd-index="8"><b>09</b><span>数据指标</span></button>
+          <button type="button" data-prd-index="9"><b>10</b><span>风险与应对</span></button>
+          <button type="button" data-prd-index="10"><b>11</b><span>原型说明</span></button>
+        </aside>
+
+        <article class="prd-reader">
+          <div class="prd-reader-top"><span>PRODUCT REQUIREMENT DOCUMENT</span><b id="prdProgress">01 / 11</b></div>
+          <div class="prd-progress"><i id="prdProgressBar"></i></div>
+          <small id="prdChapterKicker">PROJECT OVERVIEW</small>
+          <h3 id="prdChapterTitle">项目概述</h3>
+          <div class="prd-body" id="prdChapterBody"></div>
+          <div class="prd-reader-actions">
+            <button type="button" id="prdPrev">← 上一章</button>
+            <button type="button" id="prdNext">下一章 →</button>
+          </div>
+        </article>
+      </div>
+
+      <div class="prototype-showcase">
+        <div class="prototype-showcase-head reveal">
+          <div><span>FINAL PROTOTYPE</span><h3>终版原型</h3></div>
+          <p>四张原始终版画面分别呈现，完整点击与滚动逻辑可在上方 Demo 中体验。</p>
+        </div>
+        <div class="prototype-gallery">
+          <article class="prototype-gallery-card reveal">
+            <div class="prototype-gallery-phone"><img src="assets/01-entry.png" alt="购买选项入口页" /></div>
+            <span><b>01</b>购买选项入口页</span>
+          </article>
+          <article class="prototype-gallery-card reveal">
+            <div class="prototype-gallery-phone"><img src="assets/02-compare.png" alt="选项对比页" /></div>
+            <span><b>02</b>选项对比页</span>
+          </article>
+          <article class="prototype-gallery-card reveal">
+            <div class="prototype-gallery-phone"><img src="assets/03-ai.png" alt="帮我选结果页" /></div>
+            <span><b>03</b>帮我选结果页</span>
+          </article>
+          <article class="prototype-gallery-card reveal">
+            <div class="prototype-gallery-phone"><img src="assets/04-explain.png" alt="购买选项说明页" /></div>
+            <span><b>04</b>购买选项说明页</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="finale">
+      <div class="finale-rings" aria-hidden="true"><i></i><i></i><i></i></div>
+      <span class="section-marker is-dark"><b>08</b><em>项目总结</em></span>
+      <small class="finale-overline">DEWU BUYBOX PRODUCT CASE</small>
+      <h2>把购买选项<i class="keep-together">讲清楚，</i>让用户更容易<span>做决定。</span></h2>
+      <div class="finale-actions">
+        <a class="final-primary magnetic" href="#lab">再次体验原型 ↗</a>
+        <a class="final-secondary magnetic" href="https://github.com/SiyuQiannn/dewu-buybox" target="_blank" rel="noreferrer">查看 GitHub ↗</a>
+      </div>
+      <footer>
+        <p>个人产品设计项目，非得物官方方案。界面参考公开 App 页面，商品、价格与权益信息用于原型展示。</p>
+        <div><span>Product concept & interaction by Siyu Qian</span><span>2026</span></div>
+      </footer>
     </section>
   </main>
-
-  <footer class="footer">得物 Buybox 购买选项决策体验优化 · 单项目展示页</footer>
-
-  <script>
-    const options = {
-      official: {
-        name: "品牌官方",
-        price: 476,
-        eta: "约2天到",
-        meta: "官方渠道 · 更快到货",
-        sku: "金色 F 默认包装",
-        tags: ["品牌官方", "得物查验", "退货包运费", "极速退款"],
-        fit: "适合希望更快收到，同时偏好品牌渠道和售后保障更明确的用户。",
-        color: "teal"
-      },
-      special: {
-        name: "品牌专供",
-        price: 471,
-        eta: "约5-6天到",
-        meta: "价格更低 · 权益完整",
-        sku: "金色 F 默认包装",
-        tags: ["品牌专供", "得物查验", "正品险", "退货包运费"],
-        fit: "适合更在意价格，同时可以接受稍长等待时间的用户。",
-        color: "dark"
-      },
-      used: {
-        name: "95 仅鞋盒瑕疵",
-        price: 395,
-        eta: "约1-3天到",
-        meta: "成色性价比 · 二手规则",
-        sku: "金色 F 默认包装",
-        tags: ["95 仅鞋盒瑕疵", "95分查验"],
-        fit: "适合关注性价比，且能接受成色说明与二手售后规则的用户。",
-        color: "gray"
-      }
-    };
-
-    const state = {
-      screen: "entry",
-      selectedOption: "official",
-      focusOption: "official",
-      activeChip: "得物查验",
-      aiChoice: null,
-      explainTab: "渠道",
-      previousScreen: "entry",
-      prdIndex: 0
-    };
-
-    const chipCopy = {
-      "品牌官方": "品牌方或授权相关渠道供货，商品仍经过得物查验或平台品质保障。适合偏好品牌渠道的用户。",
-      "品牌专供": "来自品牌相关渠道，可能包含得物专属款、限定款或专供款，仍由得物提供查验或品质保障。",
-      "得物查验": "该商品已提前入仓、进入得物查验仓配节点，或在发货前完成平台查验。快到货不等于跳过查验。",
-      "正品险": "该选项展示正品险权益，具体保障范围以订单页和平台规则为准。",
-      "退货包运费": "该选项支持符合平台规则的退货运费保障，具体以订单页权益为准。",
-      "极速退款": "符合平台条件时可享受更快退款处理，最终以订单页展示和平台规则为准。",
-      "95 仅鞋盒瑕疵": "该选项为 95 分二手商品，当前瑕疵主要集中在鞋盒或包装，不等同于全新商品。",
-      "95分查验": "由 95 分平台完成成色与品质查验，并按二手商品规则履约。"
-    };
-
-    const explainTerms = {
-      "渠道": [
-        ["品牌官方", "品牌方或授权相关渠道供货，商品仍经过得物查验或平台品质保障。"],
-        ["品牌专供", "品牌相关渠道供货，可能包含得物专属、限定或专供款式。"],
-        ["全球购", "来自境外相关渠道，通常到货时间更长，按平台跨境链路完成查验或品质保障。"],
-        ["保税直发", "商品位于海关监管保税仓，下单后从保税仓发出。"]
-      ],
-      "成色": [
-        ["95 分", "表示该选项为 95 分二手商品，购买前会展示具体成色或瑕疵描述。"],
-        ["全新未使用", "表示商品状态接近全新，具体以页面展示的成色说明为准。"],
-        ["轻微使用", "表示商品存在轻微使用痕迹，适合更关注性价比的用户。"],
-        ["仅鞋盒瑕疵", "表示瑕疵主要集中在鞋盒或外包装，不等同于全新商品。"]
-      ],
-      "查验时效": [
-        ["提前入仓", "部分商品已提前进入得物仓或查验仓配节点，因此可以更快发出。"],
-        ["先查验后发出", "部分商品需先送至得物查验，通过后再发出，因此预计到货时间更长。"],
-        ["仓配节点", "快到货可能来自仓配前置，不代表跳过查验。"],
-        ["跨境链路", "全球购、保税直发等选项会受到运输、清关或保税仓发出方式影响。"]
-      ],
-      "售后权益": [
-        ["七天无理由", "若当前选项支持，会在权益中展示；未展示时以平台适用规则为准。"],
-        ["退货包运费", "符合平台规则时可享受退货运费保障，以订单页说明为准。"],
-        ["正品险", "部分全新商品选项展示该权益，以当前页面和订单页展示为准。"],
-        ["95 分售后", "95 分商品按二手商品售后规则处理，购买前需确认成色说明。"]
-      ]
-    };
-
-    const prdPages = [
-      {
-        title: "1. 项目概述",
-        body: `<p>本项目来源于 Buybox 机制研究的延展。得物的多购买选项机制具有典型 Buybox 特征：平台将同一商品下不同价格、渠道、成色和履约时效的购买方案聚合展示，由用户在下单前完成选择。</p><p>项目一句话：围绕得物“尺码 + 购买选项页”，设计「选项怎么选」能力，在不暴露具体供应商身份、不破坏平台统一正品心智的前提下，帮助用户理解不同购买选项的渠道、成色、时效、查验和售后差异。</p><ul><li>项目定位：电商交易产品项目。</li><li>AI 定位：结构化信息基础上的决策辅助模块，不替代官方规则说明。</li><li>核心价值：降低正品焦虑与售后预期偏差，提升下单决策效率。</li></ul>`
-      },
-      {
-        title: "2. 业务背景与产品现状",
-        body: `<p>得物以“多报价 + 先鉴别后发货”为核心交易特色。多购买选项机制可以聚合多渠道供给，提升商品可买性和价格竞争力，同时通过平台查验体系统一建立正品心智。</p><ul><li>消费者前台可见：渠道标签、成色标签、物流时效、价格与购买选项颜色。</li><li>消费者前台不可见：更细的备货方式、发货模式和后台履约链路。</li><li>产品张力：平台需要封装供给身份并维持统一保障，但用户也需要理解不同选项的实际差异。</li></ul><p>因此，方案不直接把后台履约词前台化，而是解释“为什么到货时间不同”“为什么快到也经过查验”“哪些差异属于渠道、成色或售后规则”。</p>`
-      },
-      {
-        title: "3. 核心问题定义",
-        body: `<p>当前核心问题不是“购买选项太多”，也不是“单个标签文案难懂”，而是平台统一正品心智与差异化购买决策之间存在信息表达断层。</p><ul><li>可见标签缺少下单场景内的官方解释。</li><li>时效差异容易被误读为查验差异。</li><li>价格、时效、渠道和成色信息分散，缺少横向对比。</li><li>售后权益差异披露靠后，容易造成预期偏差。</li><li>社媒不实解读填补官方信息空白，削弱平台保障心智。</li></ul>`
-      },
-      {
-        title: "4. 项目目标",
-        body: `<p>用户目标是快速回答五个问题：当前选项是否都经过得物查验或平台品质保障；为什么有些选项 1-3 天到、有些更久；标签分别是什么意思；不同选项在价格、时效、成色、渠道和售后上有什么差异；不同偏好下应该如何取舍。</p><ul><li>平台目标：强化统一品质保障，降低标签和时效误解带来的正品焦虑。</li><li>效率目标：缩短购买选项页决策时长，提升到确认订单页的转化效率。</li><li>服务目标：降低售后规则理解偏差导致的客服咨询和退货纠纷。</li></ul>`
-      },
-      {
-        title: "5. 最终方案信息架构",
-        body: `<p>本期方案只涉及两个页面层级：尺码 + 购买选项页，以及「选项怎么选」页。</p><ul><li>尺码 + 购买选项页：保持原页面主结构与现有标签体系，仅新增一个「选项怎么选」入口，并保留轻量信任说明。</li><li>选项怎么选页：页面内保留平台品质保障、当前选项对比、AI 帮我选三类模块。</li><li>标签说明、查验说明、售后权益说明沉入每个选项卡片的可点击 chip 中，不再堆成长说明模块。</li><li>页面底部提供「查看全部购买选项说明」入口，用于进入全量分类说明页。</li></ul><p>整体结构采用“轻页面 + chip 就地解释”：先比较当前选项，再按需展开解释，最后通过 AI 解释取舍。</p>`
-      },
-      {
-        title: "6. 用户链路",
-        body: `<p>当前链路：商品详情页 → 点击立即购买 → 选择尺码 → 查看购买选项 → 选择购买选项 → 确认订单 → 支付。</p><p>优化后链路在“查看购买选项”节点增加辅助分支：用户可点击「选项怎么选」查看平台品质保障、当前选项对比和 AI 帮我选，也可直接选择购买选项进入确认订单。</p><ul><li>购买选项页底部选项：直接进入确认订单页。</li><li>「选项怎么选」入口：进入辅助决策页。</li><li>辅助页购买选项：先选中展开完整信息，再点击确认按钮进入确认订单页。</li><li>chip 点击：只展开解释，不触发下单跳转。</li></ul>`
-      },
-      {
-        title: "7. 功能方案",
-        body: `<p>功能设计由上方「方案交互 Demo」完整呈现，核心模块如下：</p><ul><li>购买选项页入口：在购买选项标题处新增「选项怎么选」，避免额外“查看”入口造成重复。</li><li>平台品质保障：先说明当前可选方案均经得物查验或平台品质保障，稳定信任底座。</li><li>当前选项对比：默认选中第一个选项，展开标签、解释、适合人群和确认按钮；其他选项默认折叠，降低信息密度。</li><li>查看全部购买选项说明：按渠道、成色、查验时效、售后权益分类展示全量说明。</li><li>AI 帮我选：根据最快收到、价格更低、售后更灵活、品牌渠道优先、成色性价比等偏好解释推荐与取舍。</li></ul>`
-      },
-      {
-        title: "8. 功能优先级",
-        body: `<ul><li>P0：购买选项页新增「选项怎么选」入口；选项怎么选页；平台品质保障；当前选项对比；chip 就地解释；确认选项进入订单页。</li><li>P1：查看全部购买选项说明；AI 帮我选；不同偏好下的推荐解释；推荐采纳链路。</li><li>P2：结合历史浏览、价格敏感度和退货偏好做更细的个性化解释；引入 A/B 实验策略优化入口位置和文案。</li></ul>`
-      },
-      {
-        title: "9. 数据指标与验证方案",
-        body: `<ul><li>核心指标：购买选项页到确认订单页转化率、购买选项页平均停留时长、选项怎么选入口点击率、辅助页继续下单率。</li><li>辅助指标：chip 点击率、全部说明页访问率、AI 偏好点击率、AI 推荐采纳率。</li><li>售后指标：查验咨询量、时效咨询量、售后权益咨询量、相关退款退货争议变化。</li><li>实验方式：对入口文案、入口位置、默认展开选项、AI 模块位置进行小流量 A/B 测试。</li></ul>`
-      },
-      {
-        title: "10. 风险与应对",
-        body: `<ul><li>信息过载风险：购买选项页保持轻入口，详细解释放在辅助页和 chip 内。</li><li>负面信息影响转化风险：以支持项和规则说明为主，不把普通渠道、不支持七天无理由等做成醒目前台标签。</li><li>平台供给封装被破坏风险：解释履约链路和品质保障，不暴露具体供应商身份。</li><li>AI 推荐可信度风险：AI 只解释取舍，不做绝对承诺，权益以订单页展示为准。</li><li>规则维护成本风险：标签说明和权益说明需要结构化配置，与平台规则同步更新。</li></ul>`
-      },
-      {
-        title: "11. 原型设计说明",
-        body: `<p>终版原型覆盖四个关键状态：购买选项页入口态、选项怎么选页 chip 展开态、AI 推荐结果态、购买选项说明页。核心交互已在上方「方案交互 Demo」中以可点击链路呈现。</p><ul><li>入口态：购买选项页只保留一个「选项怎么选」入口。</li><li>Chip 展开态：当前选项对比中点击标签，就地解释渠道、查验或售后含义。</li><li>AI 推荐态：用户选择偏好后展示推荐理由和取舍。</li><li>说明页：按渠道、成色、查验时效、售后权益分类展示全量说明。</li></ul>`
-      }
-    ];
-
-    const phoneRoot = document.getElementById("phoneRoot");
-    let pendingPhoneScrollTop = null;
-
-    function currentPhoneScrollTop() {
-      return phoneRoot.querySelector(".scroll-page")?.scrollTop || 0;
-    }
-
-    function phoneShell(title, body) {
-      return `
-        <div class="phone-shell">
-          <div class="phone-status"><span>9:41</span><span>5G 88%</span></div>
-          <div class="phone-top">
-            <button class="linkish" data-action="back">‹</button>
-            <span>${title}</span>
-            <button class="linkish" data-action="home">×</button>
-          </div>
-          <div class="phone-page">${body}</div>
-        </div>
-      `;
-    }
-
-    function renderEntry() {
-      phoneRoot.innerHTML = `
-        <div class="app-hero">
-          <img src="assets/bracelet.jpg" alt="商品图" />
-        </div>
-        <div class="app-sheet">
-          <div class="product-summary">
-            <img src="assets/bracelet.jpg" alt="商品缩略图" />
-            <div>
-              <div><span class="dewu-mark">得物</span> <span class="app-price">¥471</span></div>
-              <div class="summary-meta">已选 金色 F 默认包装 ♡</div>
-            </div>
-            <div class="qty"><span>−</span><b>1</b><span>＋</span></div>
-          </div>
-          <div class="app-section">
-            <div class="section-line"><span>款式</span></div>
-            <div class="box-row"><div class="box active">金色</div><div class="box">玫瑰金色</div></div>
-          </div>
-          <div class="app-section">
-            <div class="section-line"><span>尺码</span></div>
-            <div class="box-row"><div class="box active">F</div></div>
-          </div>
-          <div class="app-section">
-            <div class="section-line">
-              <span>购买选项</span>
-              <button class="guide-link" data-screen="compare">选项怎么选 ›</button>
-            </div>
-          </div>
-          <div class="trust-strip">当前可选方案均经得物查验，具体差异可在「选项怎么选」中查看</div>
-          <div class="option-bar">
-            ${entryOption("official")}
-            ${entryOption("special")}
-            ${entryOption("used")}
-          </div>
-        </div>
-      `;
-    }
-
-    function entryOption(key) {
-      const item = options[key];
-      return `
-        <button class="buy-option ${item.color}" data-buy="${key}">
-          <span class="buy-tag">${item.name}</span>
-          <b>¥${item.price}</b>
-          <small>${item.eta}</small>
-        </button>
-      `;
-    }
-
-    function renderCompare() {
-      const body = `
-        <div class="scroll-page">
-          <div class="notice">
-            <span class="notice-icon">保</span>
-            <div><b>当前可选方案均经得物查验或平台品质保障。</b><br />差异主要在价格、渠道、成色、预计到货和售后规则，不代表正品保障差异。</div>
-          </div>
-
-          <div class="module">
-            <div class="module-title">平台品质保障 <span>查验链路</span></div>
-            <div class="assurance-flow">
-              <div class="flow-chip">提前入仓<br />部分商品已完成前置查验</div>
-              <div class="flow-chip">仓配节点<br />快到货不等于跳过查验</div>
-              <div class="flow-chip">先查验后发出<br />时效更长但规则一致</div>
-            </div>
-          </div>
-
-          <div class="module">
-            <div class="module-title">当前选项对比 <span>金色 / F / 默认包装</span></div>
-            <div class="compare-list">
-              ${compareCard("official")}
-              ${compareCard("special")}
-              ${compareCard("used")}
-            </div>
-            <button class="all-link" data-screen="explain">
-              <span>查看全部购买选项说明</span>
-              <span>渠道 / 成色 / 查验时效 / 售后 ›</span>
-            </button>
-          </div>
-
-          <div class="module">
-            <div class="module-title">AI 帮我选 <span>根据偏好解释取舍</span></div>
-            <div class="ai-choices">
-              ${["最快收到", "价格更低", "售后更灵活", "品牌渠道优先", "成色性价比"].map((choice) => `<button class="choice ${state.aiChoice === choice ? "active" : ""}" data-ai="${choice}">${choice}</button>`).join("")}
-            </div>
-            ${state.aiChoice ? aiResult() : ""}
-          </div>
-        </div>
-      `;
-      phoneRoot.innerHTML = phoneShell("选项怎么选", body);
-      const scroller = phoneRoot.querySelector(".scroll-page");
-      if (pendingPhoneScrollTop !== null && scroller) {
-        scroller.scrollTop = pendingPhoneScrollTop;
-        pendingPhoneScrollTop = null;
-      }
-    }
-
-    function compareCard(key) {
-      const item = options[key];
-      const isSelected = state.focusOption === key;
-      const chips = item.tags.map((tag) => `<button class="pill ${state.activeChip === tag && state.focusOption === key ? "active" : ""}" data-chip="${tag}" data-chip-option="${key}">${tag}</button>`).join("");
-      const detail = isSelected ? `
-        <div class="pill-row">${chips}</div>
-        <div class="inline-explain"><b>${state.activeChip}：</b>${chipCopy[state.activeChip] || "点击标签查看该标签或权益说明。"}</div>
-        <div class="fit">${item.fit}</div>
-        <button class="confirm-option" data-confirm-option="${key}">确认该购买选项，进入确认订单页</button>
-      ` : "";
-      return `
-        <div class="compare-card ${isSelected ? "selected" : ""}" data-option="${key}">
-          <div class="compare-head">
-            <div>
-              <div class="compare-name">${item.name}</div>
-              <div class="compare-meta">${item.eta} · ${item.meta}</div>
-            </div>
-            <div class="compare-price">¥${item.price}</div>
-          </div>
-          ${detail}
-        </div>
-      `;
-    }
-
-    function aiResult() {
-      const resultMap = {
-        "最快收到": {
-          key: "official",
-          title: "推荐 ¥476 / 约2天到的品牌官方选项",
-          reason: "该方案预计到货最快，适合优先考虑时效的需求。",
-          tradeoff: "价格不是最低；如果更想省钱，可考虑 ¥471 / 约5-6天到的品牌专供选项。"
-        },
-        "价格更低": {
-          key: "used",
-          title: "推荐 ¥395 / 约1-3天到的 95 分选项",
-          reason: "该方案价格最低，适合能接受成色说明且更关注性价比的需求。",
-          tradeoff: "该方案为 95 分二手商品，购买前需确认成色和售后规则。"
-        },
-        "售后更灵活": {
-          key: "special",
-          title: "推荐 ¥471 / 约5-6天到的品牌专供选项",
-          reason: "该方案展示正品险和退货包运费等权益，适合更在意售后确定性的需求。",
-          tradeoff: "不是当前最快到货选项；如果更急，可选择 ¥476 / 约2天到。"
-        },
-        "品牌渠道优先": {
-          key: "official",
-          title: "推荐 ¥476 / 约2天到的品牌官方选项",
-          reason: "该方案来自品牌方或授权相关渠道，适合偏好品牌渠道的需求。",
-          tradeoff: "价格略高；想更省钱可考虑品牌专供选项。"
-        },
-        "成色性价比": {
-          key: "used",
-          title: "推荐 ¥395 / 约1-3天到的 95 分选项",
-          reason: "该方案价格更低，适合可接受“仅鞋盒瑕疵”的用户。",
-          tradeoff: "该方案不等同于全新商品，售后按 95 分规则处理。"
-        }
-      };
-      const result = resultMap[state.aiChoice];
-      return `
-        <div class="ai-result">
-          <h3>${result.title}</h3>
-          <p>${result.reason}</p>
-          <p><b>需要取舍：</b>${result.tradeoff}</p>
-          <button data-confirm-option="${result.key}">选择该选项并去确认订单</button>
-        </div>
-      `;
-    }
-
-    function renderExplain() {
-      const list = explainTerms[state.explainTab].map(([title, desc]) => `
-        <div class="term"><h3>${title}</h3><p>${desc}</p></div>
-      `).join("");
-      const body = `
-        <div class="scroll-page">
-          <div class="tabs">
-            ${Object.keys(explainTerms).map((tab) => `<button class="tab ${state.explainTab === tab ? "active" : ""}" data-tab="${tab}">${tab}</button>`).join("")}
-          </div>
-          <div class="notice">
-            <span class="notice-icon">说</span>
-            <div><b>标签说明用于解释渠道、成色、查验时效和售后差异。</b><br />这些差异不代表正品保障差异，具体权益仍以订单页展示为准。</div>
-          </div>
-          <div class="module">
-            <div class="module-title">${state.explainTab}说明</div>
-            ${list}
-          </div>
-        </div>
-      `;
-      phoneRoot.innerHTML = phoneShell("购买选项说明", body);
-    }
-
-    function renderOrder() {
-      const item = options[state.selectedOption];
-      const body = `
-        <div class="order-page">
-          <div class="order-scroll">
-            <div class="order-block">
-              <div class="address-main">
-                <span>钱 运河东大街37号中国人民大学通州校区快递服务中心</span>
-                <span>›</span>
-              </div>
-              <div class="muted" style="font-size:13px;line-height:1.55">顺丰速运，计划明日 22:45 前发货，晚到必赔，送货上门</div>
-            </div>
-
-            <div class="order-block">
-              <div class="order-product">
-                <img src="assets/bracelet.jpg" alt="商品图" />
-                <div>
-                  <div class="order-title">COACH 蔻驰 Logo图案 字母雕刻 黄铜 手镯手链</div>
-                  <div class="order-sku">${item.sku} x1</div>
-                  <div class="order-price">¥${item.price}</div>
-                </div>
-              </div>
-              <div class="order-row">
-                <label>平台保障</label>
-                <span>${orderBenefits(item)}</span>
-                <span>›</span>
-              </div>
-              <div class="order-row">
-                <label>加购商品</label>
-                <span>1件可选择</span>
-                <span>›</span>
-              </div>
-              <div class="order-row">
-                <label>号码保护</label>
-                <span>隐藏收件人真实手机号，保护隐私</span>
-                <span class="check active">✓</span>
-              </div>
-            </div>
-
-            <div class="order-block">
-              <div class="order-row">
-                <label>支付方式</label>
-                <span>支付宝</span>
-                <span class="check active">✓</span>
-              </div>
-              <div class="order-row">
-                <label></label>
-                <span>微信支付</span>
-                <span class="check"></span>
-              </div>
-              <div class="order-row">
-                <label></label>
-                <span>得物月付</span>
-                <span class="check"></span>
-              </div>
-            </div>
-          </div>
-          <div class="pay-footer">
-            <div class="pay-total"><span>得物包邮到手价</span><b>¥${item.price}</b></div>
-            <button class="pay-button" type="button">立即支付</button>
-          </div>
-        </div>
-      `;
-      phoneRoot.innerHTML = phoneShell("确认订单", body);
-    }
-
-    function orderBenefits(item) {
-      if (item.name.startsWith("95")) return "95分查验 · 成色说明 · 二手售后规则";
-      if (item.name === "品牌官方") return "正品险 · 7天无理由退货 · 退货包运费 · 极速退款";
-      return "正品险 · 退货包运费 · 平台查验 · 买贵补偿";
-    }
-
-    function renderPhone() {
-      if (state.screen === "entry") renderEntry();
-      if (state.screen === "compare") renderCompare();
-      if (state.screen === "explain") renderExplain();
-      if (state.screen === "order") renderOrder();
-    }
-
-    function chooseOption(key) {
-      state.selectedOption = key;
-      state.focusOption = key;
-      state.activeChip = options[key].tags[0];
-      state.previousScreen = state.screen;
-      state.screen = "order";
-      renderPhone();
-    }
-
-    document.addEventListener("click", (event) => {
-      const buyButton = event.target.closest("[data-buy]");
-      const confirmButton = event.target.closest("[data-confirm-option]");
-      const screenButton = event.target.closest("[data-screen]");
-      const optionButton = event.target.closest("[data-option]");
-      const chipButton = event.target.closest("[data-chip]");
-      const aiButton = event.target.closest("[data-ai]");
-      const tabButton = event.target.closest("[data-tab]");
-      const actionButton = event.target.closest("[data-action]");
-      const prdButton = event.target.closest("[data-prd]");
-
-      if (buyButton) {
-        chooseOption(buyButton.dataset.buy);
-        return;
-      }
-
-      if (confirmButton) {
-        chooseOption(confirmButton.dataset.confirmOption);
-        return;
-      }
-
-      if (chipButton) {
-        event.stopPropagation();
-        pendingPhoneScrollTop = currentPhoneScrollTop();
-        state.focusOption = chipButton.dataset.chipOption;
-        state.activeChip = chipButton.dataset.chip;
-        state.screen = "compare";
-        renderPhone();
-        return;
-      }
-
-      if (optionButton) {
-        pendingPhoneScrollTop = currentPhoneScrollTop();
-        state.focusOption = optionButton.dataset.option;
-        state.activeChip = options[state.focusOption].tags[0];
-        state.screen = "compare";
-        renderPhone();
-        return;
-      }
-
-      if (screenButton) {
-        state.previousScreen = state.screen;
-        state.screen = screenButton.dataset.screen;
-        renderPhone();
-        return;
-      }
-
-      if (aiButton) {
-        pendingPhoneScrollTop = currentPhoneScrollTop();
-        state.aiChoice = aiButton.dataset.ai;
-        state.screen = "compare";
-        renderPhone();
-        return;
-      }
-
-      if (tabButton) {
-        state.explainTab = tabButton.dataset.tab;
-        renderPhone();
-        return;
-      }
-
-      if (actionButton) {
-        if (actionButton.dataset.action === "home") {
-          state.screen = "entry";
-        } else if (state.screen === "order") {
-          state.screen = state.previousScreen || "entry";
-        } else if (state.screen === "explain") {
-          state.screen = "compare";
-        } else {
-          state.screen = "entry";
-        }
-        renderPhone();
-        return;
-      }
-
-      if (prdButton) {
-        const action = prdButton.dataset.prd;
-        if (action === "prev") state.prdIndex = (state.prdIndex - 1 + prdPages.length) % prdPages.length;
-        if (action === "next") state.prdIndex = (state.prdIndex + 1) % prdPages.length;
-        if (!Number.isNaN(Number(action))) state.prdIndex = Number(action);
-        renderPrd();
-      }
-    });
-
-    document.getElementById("resetDemo").addEventListener("click", () => {
-      state.screen = "entry";
-      state.selectedOption = "official";
-      state.focusOption = "official";
-      state.activeChip = "得物查验";
-      state.aiChoice = null;
-      state.explainTab = "渠道";
-      state.previousScreen = "entry";
-      renderPhone();
-    });
-
-    document.querySelectorAll("[data-open-file]").forEach((button) => {
-      button.addEventListener("click", () => {
-        const target = new URL(button.dataset.openFile, window.location.href).href;
-        window.location.assign(target);
-      });
-    });
-
-    function renderPrd() {
-      const tabs = document.getElementById("prdTabs");
-      const page = document.getElementById("prdPage");
-      tabs.innerHTML = prdPages.map((item, index) => `
-        <button class="prd-tab ${index === state.prdIndex ? "active" : ""}" data-prd="${index}">${item.title}</button>
-      `).join("");
-      const current = prdPages[state.prdIndex];
-      page.innerHTML = `
-        <h3>${current.title}</h3>
-        ${current.body}
-        <div class="prd-actions">
-          <button class="btn" type="button" data-prd="prev">上一页</button>
-          <button class="btn primary" type="button" data-prd="next">下一页</button>
-        </div>
-      `;
-    }
-
-    function setupRevealMotion() {
-      const targets = document.querySelectorAll(".hero > *, .section-head, .card, .metric-card, .demo-card, .prd-browser, .asset-panel, .asset-link");
-      document.body.classList.add("reveal-ready");
-      if (!("IntersectionObserver" in window)) {
-        targets.forEach((target) => target.classList.add("is-visible"));
-        return;
-      }
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
-      targets.forEach((target, index) => {
-        target.style.transitionDelay = `${Math.min(index % 6, 5) * 45}ms`;
-        observer.observe(target);
-        const rect = target.getBoundingClientRect();
-        if (rect.top < window.innerHeight && rect.bottom > 0) {
-          target.classList.add("is-visible");
-          observer.unobserve(target);
-        }
-      });
-    }
-
-    function loadExternalScript(src) {
-      return new Promise((resolve, reject) => {
-        if (document.querySelector(`script[src="${src}"]`)) {
-          resolve();
-          return;
-        }
-        const script = document.createElement("script");
-        script.src = src;
-        script.async = true;
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
-    }
-
-    function setupGsapShowcaseMotion() {
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      const gsapUrl = "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js";
-      const scrollTriggerUrl = "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js";
-      loadExternalScript(gsapUrl)
-        .then(() => loadExternalScript(scrollTriggerUrl))
-        .then(() => {
-          if (!window.gsap || !window.ScrollTrigger) return;
-          const gsap = window.gsap;
-          const ScrollTrigger = window.ScrollTrigger;
-          gsap.registerPlugin(ScrollTrigger);
-          gsap.defaults({ duration: 0.72, ease: "power3.out" });
-
-          gsap.from(".hero .eyebrow, .hero h1, .hero .lead, .hero-actions .btn, .hero-card", {
-            autoAlpha: 0,
-            y: 26,
-            stagger: 0.07,
-            clearProps: "all"
-          });
-
-          gsap.from("#demo .demo-card:first-child", {
-            autoAlpha: 0,
-            x: -70,
-            rotation: -1.2,
-            scrollTrigger: { trigger: "#demo", start: "top 74%", once: true },
-            clearProps: "all"
-          });
-
-          gsap.from("#demo .demo-card:nth-child(2)", {
-            autoAlpha: 0,
-            x: 70,
-            rotation: 1.2,
-            delay: 0.08,
-            scrollTrigger: { trigger: "#demo", start: "top 74%", once: true },
-            clearProps: "all"
-          });
-
-          gsap.to("#demo .phone", {
-            y: -6,
-            duration: 2.8,
-            repeat: -1,
-            yoyo: true,
-            ease: "sine.inOut"
-          });
-
-          gsap.from("#context .card", {
-            autoAlpha: 0,
-            x: (index) => index % 2 === 0 ? -46 : 46,
-            skewX: (index) => index % 2 === 0 ? -2 : 2,
-            stagger: 0.12,
-            scrollTrigger: { trigger: "#context", start: "top 76%", once: true },
-            clearProps: "all"
-          });
-
-          gsap.from("#problem .card", {
-            autoAlpha: 0,
-            scale: 0.9,
-            y: 28,
-            filter: "blur(8px)",
-            stagger: { each: 0.1, from: "center" },
-            scrollTrigger: { trigger: "#problem", start: "top 76%", once: true },
-            clearProps: "all"
-          });
-
-          gsap.from("#goals .card", {
-            autoAlpha: 0,
-            y: 52,
-            rotationX: -12,
-            transformPerspective: 900,
-            transformOrigin: "top center",
-            stagger: 0.12,
-            scrollTrigger: { trigger: "#goals", start: "top 78%", once: true },
-            clearProps: "all"
-          });
-
-          gsap.from("#metrics .metric-card", {
-            autoAlpha: 0,
-            y: 34,
-            rotationY: (index) => index % 2 === 0 ? -10 : 10,
-            transformPerspective: 900,
-            stagger: 0.07,
-            scrollTrigger: { trigger: "#metrics", start: "top 78%", once: true },
-            clearProps: "all"
-          });
-
-          gsap.from("#prd .prd-tab", {
-            autoAlpha: 0,
-            x: -18,
-            stagger: 0.04,
-            scrollTrigger: { trigger: "#prd", start: "top 76%", once: true },
-            clearProps: "all"
-          });
-
-          gsap.from("#prd .prd-browser, #prd .asset-panel, #prd .asset-link", {
-            autoAlpha: 0,
-            y: 30,
-            stagger: 0.08,
-            scrollTrigger: {
-              trigger: "#prd",
-              start: "top 76%",
-              once: true
-            },
-            clearProps: "all"
-          });
-        })
-        .catch(() => {});
-    }
-
-    renderPhone();
-    renderPrd();
-    setupRevealMotion();
-    window.addEventListener("load", setupGsapShowcaseMotion);
-  </script>
+  <script src="app.js" defer></script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>得物 Buybox 购买选项说明原型 - Chip 交互版</title>
+  <title>得物 Buybox 购买选项说明原型 - 五选项版</title>
   <style>
     :root {
       --teal: #08c4c4;
@@ -301,15 +301,15 @@
       bottom: 0;
       height: 102px;
       padding: 12px 12px 18px;
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      display: flex;
       gap: 8px;
+      overflow: hidden;
       background: #fff;
     }
 
     .buy-option {
       position: relative;
-      min-width: 0;
+      flex: 0 0 104px;
       padding: 13px 10px;
       display: flex;
       flex-direction: column;
@@ -320,6 +320,8 @@
 
     .buy-option.teal { background: var(--teal); }
     .buy-option.dark { background: var(--dark); }
+    .buy-option.deep { background: #353846; }
+    .buy-option.ocean { background: #147f87; }
     .buy-option.gray { background: var(--gray); }
 
     .tag {
@@ -449,6 +451,48 @@
       padding: 10px 12px;
     }
 
+    .compare-module-five {
+      padding: 12px;
+    }
+
+    .compare-module-five .module-title {
+      margin-bottom: 8px;
+    }
+
+    .compare-module-five .compare-card {
+      margin-top: 6px;
+      padding: 8px 10px;
+    }
+
+    .compare-module-five .compare-card.selected {
+      padding-bottom: 9px;
+    }
+
+    .compare-module-five .compare-meta {
+      font-size: 11px;
+    }
+
+    .compare-module-five .compare-price {
+      font-size: 17px;
+    }
+
+    .compare-module-five .pill-row {
+      margin-top: 7px;
+      gap: 4px;
+    }
+
+    .compare-module-five .pill {
+      height: 21px;
+      padding-inline: 7px;
+      font-size: 9px;
+    }
+
+    .compare-module-five .inline-explain {
+      margin-top: 6px;
+      padding: 7px 8px;
+      font-size: 10px;
+    }
+
     .compare-head {
       display: flex;
       justify-content: space-between;
@@ -572,6 +616,51 @@
       line-height: 1.45;
     }
 
+    .option-overview {
+      margin-bottom: 10px;
+      display: flex;
+      gap: 5px;
+      overflow: hidden;
+    }
+
+    .option-overview span {
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 8px 3px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: #626774;
+      background: #fff;
+      font-size: 9px;
+      font-weight: 800;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .option-overview span.active {
+      border-color: var(--teal);
+      color: var(--teal-dark);
+      background: #e7fbfb;
+    }
+
+    .term-list.compact {
+      gap: 7px;
+    }
+
+    .term-list.compact .term {
+      padding: 9px 11px;
+    }
+
+    .term-list.compact .term h3 {
+      margin-bottom: 3px;
+      font-size: 13px;
+    }
+
+    .term-list.compact .term p {
+      font-size: 10px;
+      line-height: 1.35;
+    }
+
     .bottom-action {
       position: absolute;
       left: 0;
@@ -664,14 +753,14 @@
     <div class="board-title">
       <div>
         <h1>得物 Buybox 购买选项决策体验优化</h1>
-        <p>新版结构：对比页轻量化，说明能力内嵌到可点击 chip</p>
+        <p>五种购买选项：共同保障、当前对比、标签解释与帮我选</p>
       </div>
-      <p>v2 / Chip 解释态、全量说明页</p>
+      <p>v3 / 五选项完整原型</p>
     </div>
 
     <section class="frames">
       <div class="phone-wrap">
-        <div class="caption">01 购买选项页入口态 <span>真实 tag + 轻量入口</span></div>
+        <div class="caption">01 购买选项页入口态 <span>五种选项左右滑动</span></div>
         <div class="phone">
           <div class="hero">
             <img src="assets/bracelet.jpg" alt="商品图" />
@@ -705,7 +794,7 @@
               </div>
             </div>
             <div class="trust-strip">
-              <span>当前可选方案均经得物查验，具体差异可在「选项怎么选」中查看</span>
+              <span>5 种选项均经得物查验并享平台品质保障，左右滑动查看更多</span>
             </div>
             <div class="option-bar">
               <div class="buy-option teal">
@@ -718,6 +807,16 @@
                 <div class="buy-price">¥471</div>
                 <div class="eta">约5-6天到</div>
               </div>
+              <div class="buy-option deep">
+                <span class="tag">保税直发</span>
+                <div class="buy-price">¥458</div>
+                <div class="eta">约4-7天到</div>
+              </div>
+              <div class="buy-option ocean">
+                <span class="tag">全球购</span>
+                <div class="buy-price">¥439</div>
+                <div class="eta">约8-12天到</div>
+              </div>
               <div class="buy-option gray">
                 <span class="tag ninety"><span class="logo95">95</span> 仅鞋盒瑕疵</span>
                 <div class="buy-price">¥395</div>
@@ -729,7 +828,7 @@
       </div>
 
       <div class="phone-wrap">
-        <div class="caption">02 选项怎么选页 <span>点 chip 就地解释</span></div>
+        <div class="caption">02 选项怎么选页 <span>点标签就地解释</span></div>
         <div class="phone">
           <div class="page">
             <div class="status"><span>9:41</span><span>5G 电量</span></div>
@@ -737,10 +836,10 @@
             <div class="scroll">
               <div class="notice">
                 <span>盾</span>
-                <div><b>当前可选方案均经得物查验或平台品质保障。</b><br />差异主要在价格、渠道、成色、预计到货和售后规则。</div>
+                <div><b>5 种选项均经得物查验，并享有平台品质保障。</b><br />差异主要在价格、渠道、成色、预计到货和售后规则。</div>
               </div>
 
-              <div class="module">
+              <div class="module compare-module-five">
                 <div class="module-title">当前选项对比 <span>金色 / F / 默认包装</span></div>
                 <div class="compare-card selected">
                   <div class="compare-head">
@@ -753,8 +852,7 @@
                   <div class="pill-row">
                     <span class="pill">品牌官方</span>
                     <span class="pill active">得物查验</span>
-                    <span class="pill">退货包运费</span>
-                    <span class="pill">极速退款</span>
+                    <span class="pill">平台品质保障</span>
                   </div>
                   <div class="inline-explain"><b>得物查验：</b>该商品已提前入仓或进入得物查验仓配节点，完成查验后可更快发出。</div>
                   <div class="fit">适合希望更快收到，且偏好品牌渠道的用户。</div>
@@ -771,8 +869,37 @@
                   <div class="pill-row">
                     <span class="pill">品牌专供</span>
                     <span class="pill teal">得物查验</span>
-                    <span class="pill">正品险</span>
-                    <span class="pill">退货包运费</span>
+                    <span class="pill">平台品质保障</span>
+                  </div>
+                </div>
+
+                <div class="compare-card mini">
+                  <div class="compare-head">
+                    <div>
+                      <div class="compare-name">保税直发</div>
+                      <div class="compare-meta">约4-7天到 · 国内保税仓</div>
+                    </div>
+                    <div class="compare-price">¥458</div>
+                  </div>
+                  <div class="pill-row">
+                    <span class="pill">保税直发</span>
+                    <span class="pill teal">得物查验</span>
+                    <span class="pill">平台品质保障</span>
+                  </div>
+                </div>
+
+                <div class="compare-card mini">
+                  <div class="compare-head">
+                    <div>
+                      <div class="compare-name">全球购</div>
+                      <div class="compare-meta">约8-12天到 · 境外直邮</div>
+                    </div>
+                    <div class="compare-price">¥439</div>
+                  </div>
+                  <div class="pill-row">
+                    <span class="pill">全球购</span>
+                    <span class="pill teal">得物查验</span>
+                    <span class="pill">平台品质保障</span>
                   </div>
                 </div>
 
@@ -786,20 +913,22 @@
                   </div>
                   <div class="pill-row">
                     <span class="pill"><span class="logo95" style="color:#19b9b7">95</span> 仅鞋盒瑕疵</span>
-                    <span class="pill teal">95分查验</span>
-                    <span class="pill">二手商品售后规则</span>
+                    <span class="pill teal">得物查验</span>
+                    <span class="pill">平台品质保障</span>
                   </div>
                 </div>
                 <div class="all-link"><span>查看全部购买选项说明</span><span>渠道 / 成色 / 查验时效 / 售后 ›</span></div>
               </div>
 
               <div class="module">
-                <div class="module-title">AI 帮我选 <span>单选主偏好</span></div>
+                <div class="module-title">帮我选 <span>选择最在意的条件</span></div>
                 <div class="ai-choices">
                   <span class="choice">最快收到</span>
-                  <span class="choice">价格更低</span>
+                  <span class="choice">预算最低</span>
                   <span class="choice">售后更灵活</span>
                   <span class="choice">品牌渠道优先</span>
+                  <span class="choice">跨境但不想久等</span>
+                  <span class="choice">全新商品更划算</span>
                   <span class="choice">成色性价比</span>
                 </div>
               </div>
@@ -813,7 +942,7 @@
       </div>
 
       <div class="phone-wrap">
-        <div class="caption">03 AI 推荐结果态 <span>推荐取舍，不做硬筛选</span></div>
+        <div class="caption">03 帮我选结果态 <span>推荐理由与取舍并列说明</span></div>
         <div class="phone">
           <div class="page">
             <div class="status"><span>9:41</span><span>5G 电量</span></div>
@@ -821,53 +950,30 @@
             <div class="scroll">
               <div class="notice">
                 <span>盾</span>
-                <div><b>当前可选方案均经得物查验或平台品质保障。</b><br />差异主要在价格、渠道、成色、预计到货和售后规则。</div>
-              </div>
-
-              <div class="module crop-compare">
-                <div class="module-title">当前选项对比 <span>金色 / F / 默认包装</span></div>
-                <div class="compare-card selected">
-                  <div class="compare-head">
-                    <div>
-                      <div class="compare-name">品牌官方</div>
-                      <div class="compare-meta">约2天到 · 官方渠道</div>
-                    </div>
-                    <div class="compare-price">¥476</div>
-                  </div>
-                  <div class="pill-row">
-                    <span class="pill">品牌官方</span>
-                    <span class="pill teal">得物查验</span>
-                    <span class="pill">退货包运费</span>
-                    <span class="pill">极速退款</span>
-                  </div>
-                  <div class="inline-explain"><b>得物查验：</b>该商品已提前入仓或进入得物查验仓配节点，完成查验后可更快发出。</div>
-                  <div class="fit">适合希望更快收到，且偏好品牌渠道的用户。</div>
-                </div>
-                <div class="compare-card mini">
-                  <div class="compare-head">
-                    <div>
-                      <div class="compare-name">品牌专供</div>
-                      <div class="compare-meta">约5-6天到 · 价格更低</div>
-                    </div>
-                    <div class="compare-price">¥471</div>
-                  </div>
-                  <div class="pill-row">
-                    <span class="pill">品牌专供</span>
-                    <span class="pill teal">得物查验</span>
-                    <span class="pill">正品险</span>
-                    <span class="pill">退货包运费</span>
-                  </div>
-                  <div class="fit">适合更在意价格，同时可以接受稍长等待的用户。</div>
-                </div>
+                <div><b>5 种选项均经得物查验，并享有平台品质保障。</b><br />差异主要在价格、渠道、成色、预计到货和售后规则。</div>
               </div>
 
               <div class="module">
-                <div class="module-title">AI 帮我选 <span>当前尺码 3 个可选方案</span></div>
+                <div class="module-title">当前 5 种购买选项 <span>金色 / F</span></div>
+                <div class="option-overview">
+                  <span>品牌官方</span>
+                  <span class="active">品牌专供</span>
+                  <span>保税直发</span>
+                  <span>全球购</span>
+                  <span>95 分</span>
+                </div>
+                <div class="inline-explain"><b>共同保障：</b>所有选项均经得物查验，并享有平台品质保障。</div>
+              </div>
+
+              <div class="module">
+                <div class="module-title">帮我选 <span>当前尺码 5 个可选方案</span></div>
                 <div class="ai-choices">
                   <span class="choice">最快收到</span>
-                  <span class="choice">价格更低</span>
+                  <span class="choice">预算最低</span>
                   <span class="choice active">售后更灵活</span>
                   <span class="choice">品牌渠道优先</span>
+                  <span class="choice">跨境但不想久等</span>
+                  <span class="choice">全新商品更划算</span>
                   <span class="choice">成色性价比</span>
                 </div>
                 <div class="ai-result">
@@ -905,22 +1011,26 @@
               </div>
 
               <div class="category-title">渠道说明</div>
-              <div class="term-list">
+              <div class="term-list compact">
                 <div class="term">
                   <h3>品牌官方</h3>
-                  <p>品牌方或授权相关渠道供货，商品仍经过得物查验或平台品质保障。适合偏好品牌渠道的用户。</p>
+                  <p>品牌方或授权相关渠道供货，商品经过得物查验并享有平台品质保障。</p>
                 </div>
                 <div class="term">
                   <h3>品牌专供</h3>
-                  <p>品牌相关渠道供货，可能包含得物专属款、限定款或专供款。不同款式以页面展示为准。</p>
+                  <p>品牌相关合作渠道供货，价格和履约方式可能不同。</p>
                 </div>
                 <div class="term">
                   <h3>全球购</h3>
-                  <p>来自境外相关渠道，通常到货时间更长，按平台跨境链路完成查验或品质保障。</p>
+                  <p>来自境外相关渠道，需要经过国际运输与清关，到货时间通常更长。</p>
                 </div>
                 <div class="term">
                   <h3>保税直发</h3>
-                  <p>商品位于海关监管保税仓，下单后从保税仓发出，通常比境外直邮更快。</p>
+                  <p>商品从国内保税仓发出，通常比境外直邮更快。</p>
+                </div>
+                <div class="term">
+                  <h3>95 分</h3>
+                  <p>按页面说明展示成色与瑕疵，适合愿意用成色换取价格优势的用户。</p>
                 </div>
               </div>
 
